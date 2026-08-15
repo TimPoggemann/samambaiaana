@@ -1,0 +1,212 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import BookingForm from '../components/BookingForm.astro';
+import FlashStatusBadge from '../components/FlashStatusBadge.astro';
+import { getEntry, getCollection } from 'astro:content';
+import { getLangFromUrl, useTranslations, localized } from '../i18n/ui';
+import { resolveSeo } from '../seo/defaults';
+import { graph, pageContext, webPage, galleryList } from '../seo/schema';
+import { FLASH_STATUS_COLORS, FLASH_STATUS_LABEL_KEY, compareFlashOrder, type FlashStatus } from '../lib/flashStatus';
+
+const lang = getLangFromUrl(Astro.url);
+const t = useTranslations(lang);
+
+const seoEntry = await getEntry('singletons', 'seo').catch(() => null);
+const seo = resolveSeo(seoEntry?.data, lang, 'flash');
+
+const flashItems = (await getCollection('flash')).sort((a, b) => compareFlashOrder(a.data, b.data));
+
+/** Pads the real designs out to a fixed total, "coming soon" for the rest — matches the handoff's FLASH_TOTAL = 20. */
+const FLASH_TOTAL = 20;
+const slots = Array.from({ length: FLASH_TOTAL }, (_, i) => {
+  const item = flashItems[i];
+  return {
+    index: i,
+    image: item?.data.image ?? null,
+    label: item ? `${i + 1} — ${localized(lang, item.data.title, item.data.titleEn)}` : `${i + 1} — ${t('flash.comingSoon')}`,
+    isComingSoon: !item,
+    status: item?.data.status ?? null,
+  };
+});
+
+/** Passed to the lightbox's client script via define:vars, so its dot/label swap reuses the same colors and copy as FlashStatusBadge instead of a second hardcoded copy. */
+const STATUS_META: Record<FlashStatus, { color: string; label: string }> = {
+  available: { color: FLASH_STATUS_COLORS.available, label: t(FLASH_STATUS_LABEL_KEY.available) },
+  reserved: { color: FLASH_STATUS_COLORS.reserved, label: t(FLASH_STATUS_LABEL_KEY.reserved) },
+  taken: { color: FLASH_STATUS_COLORS.taken, label: t(FLASH_STATUS_LABEL_KEY.taken) },
+};
+
+const whereData = await getEntry('singletons', 'where').catch(() => null);
+const tourCities: { name: string; dates: string }[] = whereData?.data.tourCities ?? [];
+const CITY_OPTIONS = [
+  { label: t('book.optSaoPaulo'), value: t('book.optSaoPaulo') },
+  ...tourCities.map((c) => ({ label: `${c.name} — ${c.dates}`, value: `${c.name} — ${c.dates}` })),
+];
+
+const bookingData = await getEntry('singletons', 'booking').catch(() => null);
+const flashBookIntro = localized(lang, bookingData?.data.flashIntro, bookingData?.data.flashIntroEn) ?? '';
+
+const footerData = await getEntry('singletons', 'footer').catch(() => null);
+const contactEmail = footerData?.data.email ?? 'ssamambaiana@gmail.com';
+
+const { origin, pageUrl } = pageContext(Astro.url, Astro.site);
+const schema = graph(origin, lang, [
+  webPage(origin, { url: pageUrl, name: seo.title, description: seo.description, lang }),
+  galleryList(
+    origin,
+    pageUrl,
+    flashItems.map((item) => ({
+      title: localized(lang, item.data.title, item.data.titleEn),
+      image: item.data.image,
+    }))
+  ),
+]);
+---
+
+<BaseLayout
+  title={seo.title}
+  description={seo.description}
+  ogTitle={seo.ogTitle}
+  ogDescription={seo.ogDescription}
+  ogImage={seo.ogImage}
+  noindex={seo.noindex}
+  schema={schema}
+  simpleHeader={true}
+  noSplash={true}
+>
+  <div style="padding: clamp(2.5rem,6vw,4.5rem) clamp(20px,5vw,64px) clamp(1.5rem,3vw,2rem); max-width: 1180px; margin: 0 auto; text-align: center;">
+    <div style="font-size: 14px; color: var(--color-gold); letter-spacing: 10px; margin-bottom: 20px;">✦ ✦ ✦</div>
+    <p class="display-serif" style="margin: 0 0 16px; font-size: clamp(38px,6vw,58px); color: var(--color-ink);">{t('flash.pageTitle')}</p>
+    <p style="margin: 0 auto; font-size: 16px; font-weight: 300; color: var(--color-body); line-height: 1.8; max-width: 560px;">{t('flash.pageSub')}</p>
+  </div>
+
+  <div style="padding: 0 clamp(20px,5vw,64px) clamp(4rem,8vw,6rem); max-width: 1180px; margin: 0 auto;">
+    <div class="flash-grid" style="display: grid; gap: 22px;">
+      {slots.map((slot) => (
+        <button
+          type="button"
+          class="flash-tile"
+          data-index={slot.index}
+          data-image={slot.image ?? ''}
+          data-label={slot.label}
+          data-status={slot.status ?? ''}
+          disabled={slot.isComingSoon}
+          style="text-align: left; background: none; border: none; padding: 0; cursor: pointer; font: inherit;"
+        >
+          <div style="background: #FFFEFA; border: 0.5px solid var(--color-hairline-strong); border-radius: 8px; padding: 12px; box-shadow: 0 4px 16px rgba(74,59,36,0.06); transition: transform 0.35s ease;">
+            {slot.image ? (
+              <div style="position: relative;">
+                <img src={slot.image} alt={slot.label} style="width: 100%; aspect-ratio: 1; object-fit: cover; border-radius: 3px; display: block;" loading="lazy" />
+                <FlashStatusBadge lang={lang} status={slot.status ?? undefined} />
+              </div>
+            ) : (
+              <div style="width: 100%; aspect-ratio: 1; border-radius: 3px; display: flex; align-items: center; justify-content: center; background: var(--color-bg-strip); color: #A89A7E; font-size: 12px; letter-spacing: 1px; text-transform: uppercase;">{t('flash.comingSoon')}</div>
+            )}
+          </div>
+          <p style={`margin: 10px 0 0; font-size: 12px; letter-spacing: 0.3px; color: ${slot.isComingSoon ? '#A89A7E' : 'var(--color-text)'};`}>{slot.label}</p>
+        </button>
+      ))}
+    </div>
+  </div>
+
+  <div id="book">
+    <BookingForm lang={lang} cityOptions={CITY_OPTIONS} intro={flashBookIntro} contactEmail={contactEmail} idPrefix="flashpage-" illustrationLeft="/images/booking-illustration.webp" illustrationRight="/images/winged-illustration.webp" />
+  </div>
+
+  <!-- Lightbox -->
+  <div id="flash-modal" role="dialog" aria-modal="true" aria-label={t('flash.pageTitle')} style="display: none; position: fixed; inset: 0; z-index: 96; background: rgba(20,22,16,0.88); align-items: center; justify-content: center; padding: 30px;">
+    <button id="flash-modal-prev" type="button" aria-label="Previous" style="position: absolute; left: clamp(10px,3vw,40px); top: 50%; transform: translateY(-50%); width: 44px; height: 44px; border-radius: 50%; border: none; background: rgba(251,248,240,0.15); color: #FBF8F0; font-size: 20px; cursor: pointer;">‹</button>
+    <button id="flash-modal-next" type="button" aria-label="Next" style="position: absolute; right: clamp(10px,3vw,40px); top: 50%; transform: translateY(-50%); width: 44px; height: 44px; border-radius: 50%; border: none; background: rgba(251,248,240,0.15); color: #FBF8F0; font-size: 20px; cursor: pointer;">›</button>
+    <div style="max-width: 560px; width: 100%; background: var(--color-bg); border-radius: 10px; overflow: hidden; position: relative;">
+      <button id="flash-modal-close" type="button" aria-label="Close" style="position: absolute; top: 10px; right: 10px; width: 34px; height: 34px; border-radius: 50%; border: none; background: rgba(20,22,16,0.55); color: #FBF8F0; font-size: 18px; cursor: pointer; line-height: 1;">×</button>
+      <img id="flash-modal-image" src="" alt="" style="width: 100%; aspect-ratio: 1; object-fit: cover; display: block;" />
+      <div id="flash-modal-status" style="display: none; position: absolute; top: 10px; left: 10px; z-index: 2; align-items: center; gap: 6px; background: rgba(251,248,240,0.92); border-radius: 20px; padding: 5px 10px; box-shadow: 0 2px 8px rgba(74,59,36,0.12);">
+        <span id="flash-modal-status-dot" style="width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0;"></span>
+        <span id="flash-modal-status-label" style="font-size: 10px; letter-spacing: 1px; text-transform: uppercase; font-weight: 500;"></span>
+      </div>
+      <p id="flash-modal-label" class="display-serif" style="margin: 0; padding: 18px 22px; font-size: 22px; color: var(--color-ink); text-align: center;"></p>
+    </div>
+  </div>
+</BaseLayout>
+
+<style>
+  .flash-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  @media (min-width: 480px) {
+    .flash-grid {
+      grid-template-columns: repeat(auto-fill, minmax(190px, 1fr));
+    }
+  }
+  .flash-tile:disabled {
+    cursor: default;
+  }
+  .flash-tile:not(:disabled):hover > div {
+    transform: translateY(-3px);
+  }
+</style>
+
+<script define:vars={{ STATUS_META }}>
+  // Plain JS only — define:vars scripts are rendered inline and skip Astro's
+  // TS-stripping pass, so this just hands the data to the module script below.
+  window.__flashStatusMeta = STATUS_META;
+</script>
+
+<script>
+  const tiles = Array.from(document.querySelectorAll<HTMLButtonElement>('.flash-tile:not(:disabled)'));
+  const modal = document.getElementById('flash-modal');
+  const modalImage = document.getElementById('flash-modal-image') as HTMLImageElement | null;
+  const modalLabel = document.getElementById('flash-modal-label');
+  const modalStatus = document.getElementById('flash-modal-status');
+  const modalStatusDot = document.getElementById('flash-modal-status-dot') as HTMLElement | null;
+  const modalStatusLabel = document.getElementById('flash-modal-status-label');
+  const STATUS_META = (window as any).__flashStatusMeta as Record<string, { color: string; label: string }>;
+  let currentIndex = -1;
+
+  function openAt(i: number) {
+    const tile = tiles[i];
+    if (!tile || !modal || !modalImage || !modalLabel) return;
+    currentIndex = i;
+    modalImage.src = tile.dataset.image ?? '';
+    modalImage.alt = tile.dataset.label ?? '';
+    modalLabel.textContent = tile.dataset.label ?? '';
+
+    const meta = STATUS_META?.[tile.dataset.status ?? ''];
+    if (meta && modalStatus && modalStatusDot && modalStatusLabel) {
+      modalStatusDot.style.background = meta.color;
+      modalStatusLabel.style.color = meta.color;
+      modalStatusLabel.textContent = meta.label;
+      modalStatus.style.display = 'inline-flex';
+    } else if (modalStatus) {
+      modalStatus.style.display = 'none';
+    }
+
+    modal.style.display = 'flex';
+    document.body.style.overflow = 'hidden';
+  }
+
+  function close() {
+    if (!modal) return;
+    modal.style.display = 'none';
+    document.body.style.overflow = '';
+  }
+
+  function step(delta: number) {
+    if (!tiles.length) return;
+    openAt((currentIndex + delta + tiles.length) % tiles.length);
+  }
+
+  tiles.forEach((tile, i) => tile.addEventListener('click', () => openAt(i)));
+  document.getElementById('flash-modal-close')?.addEventListener('click', close);
+  document.getElementById('flash-modal-prev')?.addEventListener('click', () => step(-1));
+  document.getElementById('flash-modal-next')?.addEventListener('click', () => step(1));
+  modal?.addEventListener('click', (e) => {
+    if (e.target === modal) close();
+  });
+  document.addEventListener('keydown', (e) => {
+    if (modal?.style.display !== 'flex') return;
+    if (e.key === 'Escape') close();
+    if (e.key === 'ArrowLeft') step(-1);
+    if (e.key === 'ArrowRight') step(1);
+  });
+</script>

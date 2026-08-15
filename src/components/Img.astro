@@ -1,0 +1,38 @@
+---
+/**
+ * A plain <img> that knows its own intrinsic size.
+ *
+ * The site serves pre-optimised files straight out of public/, so Astro's
+ * <Image> is not available (it only processes assets under src/, and the
+ * Cloudflare adapter runs a passthrough image service). This gets the part that
+ * actually matters — width/height, so the browser reserves the box and the page
+ * stops reflowing as images arrive.
+ *
+ * Everything else is forwarded, so `class`, `loading`, `fetchpriority` and
+ * friends behave exactly as they would on a bare <img>.
+ *
+ * One gotcha when adding this to an existing tag: the `width` attribute becomes
+ * the used width whenever CSS does not set one. An image styled `h-14
+ * object-contain` with no width class therefore jumps from "as wide as the
+ * aspect ratio needs" to its full intrinsic width, letterboxing itself inside an
+ * over-wide box. Pair a fixed height with an explicit `w-auto`.
+ */
+import { imageSize } from '../images/sizes';
+import { imageSrcset } from '../images/srcset';
+
+interface Props {
+  src: string;
+  alt: string;
+  [key: string]: unknown;
+}
+
+const { src, alt, ...rest } = Astro.props;
+
+// Merged into one object before spreading: Astro emits each `{...x}` in the
+// template as its own attribute-setting expression rather than merging them,
+// so multiple spreads compile to duplicate HTML attributes — and the browser
+// keeps the *first* one, silently discarding a `sizes` (or any other) prop
+// meant to override imageSrcset()'s default.
+const attrs = { ...imageSize(src), ...imageSrcset(src), ...rest };
+---
+<img src={src} alt={alt} decoding="async" {...attrs} />

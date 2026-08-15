@@ -1,0 +1,158 @@
+---
+/**
+ * First-visit full-screen intro, staged in three beats, entirely within a 4s
+ * budget from first paint to fully gone:
+ *   1. Logo + kicker fade in together                        (~0.1s -> 0.7s)
+ *   2. Wordmark reveals letter by letter                      (~0.75s -> 1.9s)
+ *   3. Rule grows from the center outward (width, not opacity) (~2.0s -> 2.5s)
+ * ...then a short hold, auto-dismiss at 3.0s, 0.9s fade-out -> done by 3.9s.
+ * Each stage is a fixed CSS transition-delay off one shared `letters-in`
+ * class, not chained JS timers, so the sequence can't drift out of order.
+ *
+ * Dismissible early by click. Gated by sessionStorage so it only shows once
+ * per session. Rendered in the DOM on every load (so it works with JS
+ * disabled — the page underneath is simply visible immediately) and
+ * hidden/dismissed by the inline script once JS runs.
+ *
+ * Dispatches `samambaia:splashDone` (and sets `window.__samambaiaSplashDone`)
+ * the moment it's fully gone, so the hero section's own reveal — otherwise
+ * scroll-triggered immediately on load, since the hero is 100% in view from
+ * the start — can wait to animate until the splash has actually cleared
+ * instead of playing out invisibly underneath it. The window flag exists
+ * because the "already seen this session" path can dispatch before the
+ * hero's listener has attached — a plain event alone would be missed.
+ */
+import { useTranslations, type Lang } from '../i18n/ui';
+
+interface Props {
+  lang: Lang;
+}
+
+const { lang } = Astro.props;
+const t = useTranslations(lang);
+const NAME = 'Samambaia Ana';
+---
+
+<div id="splash" style="position: fixed; inset: 0; z-index: 100; background: #14140F; display: flex; flex-direction: column; align-items: center; justify-content: center; cursor: pointer; transition: opacity 0.9s cubic-bezier(0.16,1,0.3,1);">
+  <img id="splash-logo" src="/images/logo.webp" alt="Samambaia Ana" style="height: 54px; width: auto; margin-bottom: 26px;" />
+  <div id="splash-kicker" style="font-size: 12px; letter-spacing: 6px; text-transform: uppercase; color: var(--color-gold-bright);">{t('splash.kicker')}</div>
+  <p style="margin: 22px 0 0; font-family: 'Cormorant Garamond', serif; font-style: italic; font-weight: 400; font-size: clamp(40px,8vw,74px); color: var(--color-footer-text); letter-spacing: 4px;">
+    <span id="splash-word">{NAME}</span>
+  </p>
+  <!-- Centered by the parent flex column's align-items:center, so animating
+       width alone (no left/transform tricks needed) grows it symmetrically
+       from the middle outward as its box widens. -->
+  <div id="splash-rule" style="height: 0.5px; background: var(--color-gold-bright); margin-top: 22px;"></div>
+</div>
+
+<style>
+  /*
+   * Initial (pre-reveal) state lives here, in the stylesheet, deliberately —
+   * NOT as inline styles on the elements above. An inline style always wins
+   * over any external stylesheet rule regardless of specificity, so an
+   * inline `opacity: 0` would make the `.letters-in` variant below
+   * unable to ever override it. Keeping both states here lets normal
+   * cascade order (this rule, then the more-specific `.letters-in` one)
+   * decide correctly.
+   */
+  #splash-logo,
+  #splash-kicker {
+    opacity: 0;
+    transition: opacity 0.6s ease 0.1s;
+  }
+  #splash-rule {
+    width: 0;
+    transition: width 0.5s ease 2s;
+  }
+  /* Same per-letter reveal as the hero headline's LetterReveal component
+     (see .reveal .letter in global.css) — opacity + an 8px rise, not a roll.
+     :global() is required here: the spans are created client-side via
+     document.createElement, so Astro's scoped-style hash class (which it
+     only stamps onto elements literally present in this component's
+     template) never lands on them — a scoped `.letter` selector would
+     silently match nothing. */
+  #splash-word :global(.letter) {
+    display: inline-block;
+    opacity: 0;
+    transform: translateY(8px);
+    transition: opacity 0.4s ease var(--d, 0s), transform 0.4s ease var(--d, 0s);
+  }
+  #splash.letters-in #splash-logo,
+  #splash.letters-in #splash-kicker {
+    opacity: 1;
+  }
+  #splash.letters-in #splash-word :global(.letter) {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  #splash.letters-in #splash-rule {
+    width: 60px;
+  }
+  #splash.leaving {
+    opacity: 0;
+    pointer-events: none;
+  }
+  #splash.done {
+    visibility: hidden;
+    pointer-events: none;
+  }
+</style>
+
+<script>
+  const KEY = 'samambaia-splash-seen';
+  const splash = document.getElementById('splash');
+  const wordEl = document.getElementById('splash-word');
+
+  function announceDone() {
+    (window as any).__samambaiaSplashDone = true;
+    window.dispatchEvent(new Event('samambaia:splashDone'));
+  }
+
+  if (splash && wordEl) {
+    // Split the wordmark into per-letter spans. Each letter's own
+    // transition-delay (--d) starts the stagger at 0.75s — after the logo
+    // and kicker have finished fading in — so the beats read as sequential.
+    const text = wordEl.textContent ?? '';
+    const NAME_START = 0.75;
+    const NAME_STAGGER = 0.055;
+    wordEl.textContent = '';
+    [...text].forEach((ch, i) => {
+      const span = document.createElement('span');
+      span.className = 'letter';
+      span.style.setProperty('--d', `${(NAME_START + i * NAME_STAGGER).toFixed(3)}s`);
+      // A plain space is the sole content of an inline-block span, so normal
+      // whitespace-collapsing rules trim it to zero width; a non-breaking
+      // space is exempt from that collapsing and keeps the gap visible.
+      span.textContent = ch === ' ' ? ' ' : ch;
+      wordEl.appendChild(span);
+    });
+
+    const alreadySeen = sessionStorage.getItem(KEY);
+    if (alreadySeen) {
+      splash.classList.add('done');
+      announceDone();
+    } else {
+      requestAnimationFrame(() => requestAnimationFrame(() => splash.classList.add('letters-in')));
+
+      let dismissed = false;
+      const dismiss = () => {
+        if (dismissed) return;
+        dismissed = true;
+        sessionStorage.setItem(KEY, '1');
+        splash.classList.add('leaving');
+        setTimeout(() => {
+          splash.classList.add('done');
+          announceDone();
+        }, 900);
+      };
+
+      splash.addEventListener('click', dismiss);
+      // Rule finishes growing at ~2.5s; a short hold, then dismiss at 3s so
+      // the 0.9s fade-out lands at 3.9s — the whole thing under 4s.
+      setTimeout(dismiss, 3000);
+    }
+  } else {
+    // No splash markup (shouldn't happen) — don't leave the hero waiting forever.
+    announceDone();
+  }
+</script>

@@ -1,0 +1,28 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { getLangFromUrl, useTranslations, localizePath } from '../i18n/ui';
+
+Astro.response.status = 404;
+
+const lang = getLangFromUrl(Astro.url);
+const t = useTranslations(lang);
+---
+
+<BaseLayout
+  title={t('notFound.title')}
+  description={t('notFound.body')}
+  noindex={true}
+  noSplash={true}
+>
+  <section class="min-h-[70vh] flex flex-col items-center justify-center text-center px-6 py-24">
+    <p class="text-xs uppercase tracking-[0.2em] opacity-40 mb-4">{t('notFound.eyebrow')}</p>
+    <h1 class="text-3xl md:text-5xl font-bold">{t('notFound.title')}</h1>
+    <p class="mt-4 max-w-md opacity-70">{t('notFound.body')}</p>
+    <a
+      href={localizePath('/', lang)}
+      class="mt-10 border border-current px-8 py-2.5 text-sm hover:bg-current hover:text-[var(--color-bg)] transition-colors"
+    >
+      {t('notFound.cta')}
+    </a>
+  </section>
+</BaseLayout>

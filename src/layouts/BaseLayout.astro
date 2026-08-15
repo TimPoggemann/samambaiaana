@@ -1,0 +1,303 @@
+---
+import '../styles/global.css';
+import { getEntry } from 'astro:content';
+import {
+  getLangFromUrl,
+  useTranslations,
+  localizePath,
+  stripLangPrefix,
+  ptOnlyPaths,
+  type Lang,
+} from '../i18n/ui';
+
+import SplashScreen from '../components/SplashScreen.astro';
+import { SITE_NAME, SITE_URL } from '../seo/defaults';
+
+interface Props {
+  title?: string;
+  description?: string;
+  ogTitle?: string;
+  ogDescription?: string;
+  ogImage?: string | null;
+  ogType?: 'website' | 'article' | 'profile';
+  /** Serialised JSON-LD @graph, built with the helpers in src/seo/schema.ts. */
+  schema?: string;
+  noindex?: boolean;
+  /** Minimal "← Home / wordmark / lang" header instead of the full nav — used by /flash. */
+  simpleHeader?: boolean;
+  /** Skip the splash intro (used on non-homepage pages). */
+  noSplash?: boolean;
+}
+
+const {
+  title = SITE_NAME,
+  description = '',
+  ogTitle,
+  ogDescription,
+  ogImage,
+  ogType = 'website',
+  schema,
+  noindex = false,
+  simpleHeader = false,
+  noSplash = false,
+} = Astro.props;
+
+const footerData = await getEntry('singletons', 'footer').catch(() => null);
+const footer = {
+  location: footerData?.data.location ?? '',
+  locationEn: footerData?.data.locationEn ?? '',
+  email: footerData?.data.email ?? 'ssamambaiana@gmail.com',
+  instagramUrl: footerData?.data.instagramUrl ?? 'https://instagram.com/samambaiaana',
+  shopUrl: footerData?.data.shopUrl ?? 'https://samambaiaana.lojavirtualnuvem.com.br',
+};
+
+const currentPath = Astro.url.pathname;
+const lang = getLangFromUrl(Astro.url);
+const t = useTranslations(lang);
+const basePath = stripLangPrefix(currentPath);
+const otherLang: Lang = lang === 'pt' ? 'en' : 'pt';
+const home = localizePath('/', lang);
+
+const footerLocation = lang === 'en' && footer.locationEn ? footer.locationEn : footer.location;
+
+const nav = [
+  { key: 'nav.work' as const, href: `${home}#work` },
+  { key: 'nav.flash' as const, href: `${home}#flash` },
+  { key: 'nav.about' as const, href: `${home}#about` },
+].map(({ key, href }) => ({ label: t(key), href }));
+const bookHref = `${home}#book`;
+
+const switchHref = `${localizePath(basePath, otherLang)}?lang=${otherLang}`;
+const siteUrl = Astro.site ?? new URL(SITE_URL);
+const canonical = new URL(currentPath, siteUrl).href;
+const altPt = new URL(localizePath(basePath, 'pt'), siteUrl).href;
+const altEn = new URL(localizePath(basePath, 'en'), siteUrl).href;
+const isPtOnly = ptOnlyPaths.includes(basePath);
+
+const withBrand = (value: string) => (value.includes(SITE_NAME) ? value : `${value} — ${SITE_NAME}`);
+const pageTitle = withBrand(title);
+const socialTitle = withBrand(ogTitle ?? title);
+const socialDescription = ogDescription ?? description;
+const robotsContent = noindex
+  ? 'noindex, follow'
+  : 'index, follow, max-image-preview:large, max-snippet:-1';
+
+const defaultSocialImage = '/og-image.jpg';
+const usingDefaultSocialImage = !ogImage;
+const socialImage = new URL(ogImage || defaultSocialImage, siteUrl).href;
+const ogLocale = lang === 'en' ? 'en_GB' : 'pt_BR';
+---
+<!doctype html>
+<html lang={lang} id="top">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content={description} />
+    <title>{pageTitle}</title>
+    <meta name="author" content={SITE_NAME} />
+    <meta name="robots" content={robotsContent} />
+    <meta name="theme-color" content="#FBF8F0" />
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png" />
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16.png" />
+    <link rel="apple-touch-icon" sizes="180x180" href="/favicon-180.png" />
+    <link rel="canonical" href={canonical} />
+    {!isPtOnly && (
+      <>
+        <link rel="alternate" hreflang="pt" href={altPt} />
+        <link rel="alternate" hreflang="en" href={altEn} />
+        <link rel="alternate" hreflang="x-default" href={altPt} />
+      </>
+    )}
+
+    <meta property="og:type" content={ogType} />
+    <meta property="og:site_name" content={SITE_NAME} />
+    <meta property="og:title" content={socialTitle} />
+    <meta property="og:description" content={socialDescription} />
+    <meta property="og:url" content={canonical} />
+    <meta property="og:locale" content={ogLocale} />
+    {!isPtOnly && <meta property="og:locale:alternate" content={lang === 'en' ? 'pt_BR' : 'en_GB'} />}
+    <meta property="og:image" content={socialImage} />
+    {usingDefaultSocialImage && (
+      <>
+        <meta property="og:image:type" content="image/jpeg" />
+        <meta property="og:image:width" content="1200" />
+        <meta property="og:image:height" content="630" />
+      </>
+    )}
+    <meta property="og:image:alt" content={description} />
+
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={socialTitle} />
+    <meta name="twitter:description" content={socialDescription} />
+    <meta name="twitter:image" content={socialImage} />
+    <meta name="twitter:image:alt" content={description} />
+
+    {schema && <script type="application/ld+json" is:inline set:html={schema} />}
+  </head>
+  <body>
+
+    {!noSplash && <SplashScreen lang={lang} />}
+
+    <a href="#main-content" class="skip-link">{t('a11y.skip')}</a>
+
+    {simpleHeader ? (
+      <div style="display: flex; align-items: center; justify-content: space-between; padding: 20px clamp(20px,5vw,64px); border-bottom: 0.5px solid var(--color-hairline);">
+        <a href={home} style="font-size: 12px; letter-spacing: 1.5px; text-transform: uppercase; color: var(--color-label);">{t('flash.back')}</a>
+        <div class="display-serif" style="font-size: 20px; color: var(--color-ink);">{SITE_NAME}</div>
+        <div style="display: flex; gap: 6px; font-size: 12px; letter-spacing: 1.5px; text-transform: uppercase;">
+          <a href={`${localizePath(basePath, 'en')}?lang=en`} style={`color: ${lang === 'en' ? 'var(--color-ink)' : '#B0A488'};`}>EN</a>
+          <span style="color: #D8CFB7;">/</span>
+          <a href={`${localizePath(basePath, 'pt')}?lang=pt`} style={`color: ${lang === 'pt' ? 'var(--color-ink)' : '#B0A488'};`}>PT</a>
+        </div>
+      </div>
+    ) : (
+      <>
+        <header id="site-header" style="position: sticky; top: 0; z-index: 70; display: flex; align-items: center; justify-content: space-between; padding: 18px clamp(20px,5vw,64px); background: rgba(251,248,240,0.92); backdrop-filter: blur(6px); border-bottom: 0.5px solid var(--color-hairline);">
+          <a href={home} aria-label={t('a11y.home')} class="display-serif" style="display: flex; align-items: center; gap: 12px; font-size: 24px; letter-spacing: 1px; color: var(--color-text);">
+            <img src="/images/logo.webp" alt="" style="height: 40px; width: auto; opacity: 0.85;" />
+            <span style="font-weight: 300;">{SITE_NAME}</span>
+          </a>
+
+          <nav aria-label={t('a11y.mainNav')} class="desktop-nav" style="display: flex; align-items: center; gap: 34px; font-size: 12px; letter-spacing: 1.5px; text-transform: uppercase; color: var(--color-label);">
+            {nav.map(({ label, href }) => (
+              <a href={href} style="color: var(--color-label);">{label}</a>
+            ))}
+            <a href={bookHref} style="border: 0.5px solid var(--color-gold); color: var(--color-text); padding: 9px 22px; border-radius: 30px;">{t('nav.book')}</a>
+            <div style="display: flex; align-items: center; gap: 6px; margin-left: 6px; font-size: 11px; letter-spacing: 1px;">
+              <a href={`${localizePath(basePath, 'en')}?lang=en`} style={`color: ${lang === 'en' ? 'var(--color-ink)' : '#B0A488'};`}>EN</a>
+              <span style="color: #D8CFB7;">/</span>
+              <a href={`${localizePath(basePath, 'pt')}?lang=pt`} style={`color: ${lang === 'pt' ? 'var(--color-gold)' : '#B0A488'};`}>PT</a>
+            </div>
+          </nav>
+
+          <button id="menu-toggle" aria-label={t('a11y.openMenu')} data-label-open={t('a11y.openMenu')} data-label-close={t('a11y.closeMenu')} aria-expanded="false" aria-controls="mobile-menu" class="mobile-nav-toggle" style="display: none; flex-direction: column; gap: 5px; background: none; border: none; padding: 10px; cursor: pointer;">
+            <span class="hamburger-line" style="width: 24px; height: 1.5px; background: var(--color-ink); display: block; transition: transform 0.25s ease, opacity 0.25s ease;"></span>
+            <span class="hamburger-line" style="width: 24px; height: 1.5px; background: var(--color-ink); display: block;"></span>
+            <span class="hamburger-line" style="width: 24px; height: 1.5px; background: var(--color-ink); display: block; transition: transform 0.25s ease;"></span>
+          </button>
+        </header>
+
+        <div id="mobile-menu" role="dialog" aria-modal="true" aria-label={t('a11y.menuDialog')} inert style="display: none; position: fixed; inset: 0; z-index: 60; background: var(--color-bg); flex-direction: column; align-items: center; justify-content: center; gap: 30px;">
+          {nav.map(({ label, href }) => (
+            <a href={href} class="display-serif" style="font-size: 28px; color: var(--color-ink);">{label}</a>
+          ))}
+          <a href={bookHref} style="border: 0.5px solid var(--color-gold); color: var(--color-text); padding: 13px 34px; border-radius: 30px; font-size: 12px; letter-spacing: 1.5px; text-transform: uppercase;">{t('nav.book')}</a>
+          <div style="display: flex; align-items: center; gap: 8px; margin-top: 10px; font-size: 13px; letter-spacing: 1px;">
+            <a href={`${localizePath(basePath, 'en')}?lang=en`} style={`color: ${lang === 'en' ? 'var(--color-ink)' : '#B0A488'};`}>EN</a>
+            <span style="color: #D8CFB7;">/</span>
+            <a href={`${localizePath(basePath, 'pt')}?lang=pt`} style={`color: ${lang === 'pt' ? 'var(--color-ink)' : '#B0A488'};`}>PT</a>
+          </div>
+        </div>
+      </>
+    )}
+
+    <main id="main-content">
+      <slot />
+    </main>
+
+    <footer aria-label={t('a11y.footer')} style="padding: clamp(3rem,6vw,4.5rem) 26px; background: var(--color-footer-bg); text-align: center;">
+      <img src="/images/logo.webp" alt="" style="display: block; height: 60px; width: auto; margin: 0 auto 18px; filter: brightness(0) saturate(100%) invert(85%) sepia(15%) saturate(700%) hue-rotate(5deg) brightness(105%);" />
+      <p class="display-serif" style="margin: 0 0 8px; font-size: 24px; letter-spacing: 1px; color: var(--color-footer-text);">{SITE_NAME}</p>
+      <p style="margin: 0 0 22px; font-size: 10px; letter-spacing: 2px; text-transform: uppercase; color: var(--color-footer-text-dimmer);">{footerLocation}</p>
+      <div style="display: flex; gap: 26px; justify-content: center; font-size: 11px; letter-spacing: 1px; text-transform: uppercase;">
+        <a href={footer.instagramUrl} style="color: var(--color-footer-text-dim);">{t('footer.instagram')}</a>
+        <a href={footer.shopUrl} style="color: var(--color-footer-text-dim);">{t('footer.shop')}</a>
+        <a href={`mailto:${footer.email}`} style="color: var(--color-footer-text-dim);">{t('footer.email')}</a>
+      </div>
+      <p style="margin: 22px 0 0; font-size: 10px; letter-spacing: 1px; color: #6A6558;">{footer.email}</p>
+      <p style="margin: 10px 0 0; font-size: 10px; letter-spacing: 1px; color: #6A6558;">
+        <a href="/privacy" style="color: #6A6558;">{t('common.privacy')}</a>
+        &nbsp;·&nbsp;
+        <a href="/terms" style="color: #6A6558;">{t('common.terms')}</a>
+      </p>
+    </footer>
+
+    <script>
+      // Mobile hamburger nav — shown/hidden purely via the media query below;
+      // this only wires up open/close behavior once the toggle is visible.
+      const toggle = document.getElementById('menu-toggle') as HTMLButtonElement | null;
+      const menu = document.getElementById('mobile-menu');
+      const lines = document.querySelectorAll('.hamburger-line');
+      let open = false;
+
+      function openMenu() {
+        open = true;
+        toggle?.setAttribute('aria-expanded', 'true');
+        toggle?.setAttribute('aria-label', toggle.dataset.labelClose ?? 'Close menu');
+        menu?.removeAttribute('inert');
+        if (menu) menu.style.display = 'flex';
+        if (lines[0]) (lines[0] as HTMLElement).style.transform = 'translateY(6.5px) rotate(45deg)';
+        if (lines[1]) (lines[1] as HTMLElement).style.opacity = '0';
+        if (lines[2]) (lines[2] as HTMLElement).style.transform = 'translateY(-6.5px) rotate(-45deg)';
+        (menu?.querySelector('a') as HTMLElement | null)?.focus();
+      }
+
+      function closeMenu() {
+        open = false;
+        toggle?.setAttribute('aria-expanded', 'false');
+        toggle?.setAttribute('aria-label', toggle.dataset.labelOpen ?? 'Open menu');
+        menu?.setAttribute('inert', '');
+        if (menu) menu.style.display = 'none';
+        if (lines[0]) (lines[0] as HTMLElement).style.transform = '';
+        if (lines[1]) (lines[1] as HTMLElement).style.opacity = '1';
+        if (lines[2]) (lines[2] as HTMLElement).style.transform = '';
+        toggle?.focus();
+      }
+
+      toggle?.addEventListener('click', () => (open ? closeMenu() : openMenu()));
+      document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && open) closeMenu();
+      });
+      menu?.querySelectorAll('a').forEach((a) => a.addEventListener('click', closeMenu));
+
+      // Shared scroll-reveal: any element with class="reveal" gets `.revealed`
+      // added once it crosses 15% into the viewport (ported from the
+      // handoff's IntersectionObserver, threshold 0.15, fires once).
+      //
+      // [data-manual-reveal] opts out: the hero is 100% in view from the
+      // instant the page loads, so this observer would fire for it
+      // immediately and its letter-reveal would finish playing out entirely
+      // underneath the still-opaque splash screen. That one is revealed by
+      // its own script instead, once the splash actually clears.
+      const revealObserver = new IntersectionObserver(
+        (entries) => {
+          entries.forEach((entry) => {
+            if (entry.isIntersecting) {
+              entry.target.classList.add('revealed');
+              revealObserver.unobserve(entry.target);
+            }
+          });
+        },
+        { threshold: 0.15 }
+      );
+      document.querySelectorAll('.reveal:not([data-manual-reveal])').forEach((el) => revealObserver.observe(el));
+    </script>
+  </body>
+</html>
+
+<style>
+  .skip-link {
+    position: absolute;
+    top: -100%;
+    left: 1rem;
+    z-index: 9999;
+    background: var(--color-ink);
+    color: var(--color-bg);
+    padding: 0.5rem 1rem;
+    font-size: 0.875rem;
+    text-decoration: none;
+    transition: top 0.2s;
+  }
+  .skip-link:focus {
+    top: 1rem;
+  }
+
+  @media (max-width: 768px) {
+    .desktop-nav {
+      display: none !important;
+    }
+    .mobile-nav-toggle {
+      display: flex !important;
+    }
+  }
+</style>

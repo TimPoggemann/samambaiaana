@@ -1,0 +1,560 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import LetterReveal from '../components/LetterReveal.astro';
+import BookingForm from '../components/BookingForm.astro';
+import FlashStatusBadge from '../components/FlashStatusBadge.astro';
+import { compareFlashOrder } from '../lib/flashStatus';
+import { getEntry, getCollection } from 'astro:content';
+import { getLangFromUrl, useTranslations, localized } from '../i18n/ui';
+import { resolveSeo } from '../seo/defaults';
+import { graph, pageContext, webPage, galleryList } from '../seo/schema';
+
+const lang = getLangFromUrl(Astro.url);
+const t = useTranslations(lang);
+
+const seoEntry = await getEntry('singletons', 'seo').catch(() => null);
+const seo = resolveSeo(seoEntry?.data, lang, 'homepage');
+
+const heroData = await getEntry('singletons', 'hero').catch(() => null);
+const heroHeading = localized(lang, heroData?.data.heading, heroData?.data.headingEn) ?? 'Magia além da pele';
+const heroIntro = localized(lang, heroData?.data.intro, heroData?.data.introEn) ?? '';
+const heroButton = localized(lang, heroData?.data.button, heroData?.data.buttonEn) ?? '';
+const heroMediaType: 'video' | 'image' = heroData?.data.mediaType === 'image' ? 'image' : 'video';
+const heroVideo = heroData?.data.video ?? '/videos/hero-video.mp4';
+const heroImage = heroData?.data.image ?? '/images/hero-illustration.webp';
+const heroImageAlt = localized(lang, heroData?.data.imageAlt, heroData?.data.imageAltEn) ?? '';
+const isDarkMedia = heroMediaType === 'video';
+
+function heroWordColor(wi: number, count: number): string | null {
+  if (isDarkMedia) return null;
+  if (wi === 1) return 'var(--color-ink)';
+  if (wi >= count - 2) return 'var(--color-gold)';
+  return null;
+}
+
+const aboutData = await getEntry('singletons', 'about').catch(() => null);
+const bioP1 = localized(lang, aboutData?.data.bioP1, aboutData?.data.bioP1En) ?? '';
+const bioP2 = localized(lang, aboutData?.data.bioP2, aboutData?.data.bioP2En) ?? '';
+const portrait = aboutData?.data.portrait ?? '/images/about-portrait.webp';
+const portraitAlt = localized(lang, aboutData?.data.portraitAlt, aboutData?.data.portraitAltEn) ?? '';
+
+const whereData = await getEntry('singletons', 'where').catch(() => null);
+const studioPhoto = whereData?.data.studioPhoto ?? '/images/studio-photo.webp';
+const studioPhotoAlt = localized(lang, whereData?.data.studioPhotoAlt, whereData?.data.studioPhotoAltEn) ?? '';
+const tourCities: { name: string; dates: string }[] = whereData?.data.tourCities ?? [];
+
+const bookingData = await getEntry('singletons', 'booking').catch(() => null);
+const bookingIntro = localized(lang, bookingData?.data.intro, bookingData?.data.introEn) ?? '';
+const bookingIllustration = bookingData?.data.illustration ?? '/images/booking-illustration.webp';
+
+const portfolio = (await getCollection('portfolio')).sort((a, b) => a.data.order - b.data.order);
+const portfolioMain = portfolio.slice(0, 7); // slots 0-6, the fixed mosaic
+const portfolioZoom = portfolio.find((p) => p.data.order === 7) ?? portfolio[7];
+
+const flashItems = (await getCollection('flash')).sort((a, b) => compareFlashOrder(a.data, b.data)).slice(0, 8);
+const testimonials = (await getCollection('testimonials')).sort((a, b) => a.data.order - b.data.order);
+const faqItems = (await getCollection('faq')).sort((a, b) => a.data.order - b.data.order);
+const otherWork = (await getCollection('otherWork')).sort((a, b) => a.data.order - b.data.order);
+
+/**
+ * Hand-tuned asymmetric mosaic layout, ported directly from the handoff's
+ * `mosaicItems` / `mobileMosaicItems` arrays — a fixed design decision, not
+ * CMS-editable. Index matches portfolio slot `order` 0-6 (slot 7 is the
+ * separate scroll-zoom tile, handled on its own below).
+ */
+const DESKTOP_SPANS = [
+  { col: 3, row: 3 },
+  { col: 3, row: 2 },
+  { col: 3, row: 2 },
+  { col: 2, row: 2 },
+  { col: 2, row: 2 },
+  { col: 2, row: 3 },
+  { col: 4, row: 2 },
+];
+const MOBILE_SPANS = [
+  { col: 2, ratio: '16/11', offset: 0 },
+  { col: 1, ratio: '3/4', offset: 18 },
+  { col: 1, ratio: '4/5', offset: 0 },
+  { col: 2, ratio: '4/3', offset: 4 },
+  { col: 1, ratio: '1/1', offset: 0 },
+  { col: 1, ratio: '4/5', offset: 22 },
+  { col: 2, ratio: '16/10', offset: 0 },
+];
+
+const CITY_OPTIONS = [
+  { label: t('book.optSaoPaulo'), value: t('book.optSaoPaulo') },
+  ...tourCities.map((c) => ({ label: `${c.name} — ${c.dates}`, value: `${c.name} — ${c.dates}` })),
+];
+
+const footerData = await getEntry('singletons', 'footer').catch(() => null);
+const contactEmail = footerData?.data.email ?? 'ssamambaiana@gmail.com';
+
+const { origin, pageUrl } = pageContext(Astro.url, Astro.site);
+const schema = graph(origin, lang, [
+  webPage(origin, { url: pageUrl, name: seo.title, description: seo.description, lang }),
+  galleryList(
+    origin,
+    pageUrl,
+    portfolio.map((p) => ({
+      title: `Tattoo work #${p.data.order + 1}`,
+      image: p.data.image,
+      imageAlt: localized(lang, p.data.imageAlt, p.data.imageAltEn),
+    }))
+  ),
+]);
+---
+
+<BaseLayout
+  title={seo.title}
+  description={seo.description}
+  ogTitle={seo.ogTitle}
+  ogDescription={seo.ogDescription}
+  ogImage={seo.ogImage}
+  noindex={seo.noindex}
+  schema={schema}
+>
+  <!-- HERO -->
+  <div style="position: relative; overflow: hidden; min-height: 82vh; display: flex; align-items: flex-end; justify-content: flex-start;">
+    {heroMediaType === 'video' ? (
+      <video autoplay loop muted playsinline style="position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; background: var(--color-hairline);">
+        <source src={heroVideo} type="video/mp4" />
+      </video>
+    ) : (
+      <img src={heroImage} alt={heroImageAlt} style="position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; opacity: 0.85; animation: heroDrift1 18s ease-in-out infinite;" />
+    )}
+    {heroMediaType === 'video' ? (
+      <div style="position: absolute; inset: 0; background: linear-gradient(to top, rgba(20,22,16,0.65) 0%, rgba(20,22,16,0.35) 40%, rgba(20,22,16,0.15) 68%, rgba(20,22,16,0.25) 100%); pointer-events: none;"></div>
+    ) : (
+      <div style="position: absolute; inset: 0; background: linear-gradient(to top, rgba(251,248,240,0.98) 0%, rgba(251,248,240,0.9) 24%, rgba(251,248,240,0.4) 46%, rgba(251,248,240,0) 68%); pointer-events: none;"></div>
+    )}
+
+    <div class="reveal hero-intro-wrap" data-manual-reveal style={`position: relative; max-width: min(1160px, 92vw); text-align: ${isDarkMedia ? 'left' : 'center'}; padding: 0 ${isDarkMedia ? 'clamp(24px,6vw,80px)' : '24px'} ${isDarkMedia ? '2rem' : '3rem'};`}>
+      <div style={`font-size: 14px; letter-spacing: 10px; margin-bottom: 24px; color: ${isDarkMedia ? '#E8CFA0' : 'var(--color-gold)'};`}>
+        <span style="display: inline-block; animation: sparkleTwinkle 2.2s ease-in-out 0s infinite;">✦</span>
+        <span style="display: inline-block; animation: sparkleTwinkle 2.2s ease-in-out 0.35s infinite;">✦</span>
+        <span style="display: inline-block; animation: sparkleTwinkle 2.2s ease-in-out 0.7s infinite;">✦</span>
+      </div>
+      <p class="hero-headline" style={`margin: 0 0 22px; font-family: 'Cormorant Garamond', serif; font-size: clamp(52px,7.8vw,94px); font-weight: 400; font-style: italic; line-height: 1.04; color: ${isDarkMedia ? '#FBF8F0' : 'var(--color-ink)'}; text-shadow: ${isDarkMedia ? '0 2px 20px rgba(0,0,0,0.35)' : '0 2px 24px rgba(251,248,240,0.6)'};`}>
+        <LetterReveal text={heroHeading} breakAfterWordIndex={1} wordColor={heroWordColor} staggerMs={45} />
+      </p>
+      <p class="hero-subheadline" style={`margin: 0 0 34px; font-size: 17px; font-weight: 300; letter-spacing: 0.1px; color: ${isDarkMedia ? '#F0EAD9' : 'var(--color-text)'}; line-height: 1.9; white-space: nowrap;`}>{heroIntro}</p>
+      <a href="#book" style={`display: inline-block; background: ${isDarkMedia ? '#FBF8F0' : 'var(--color-ink)'}; color: ${isDarkMedia ? 'var(--color-ink)' : '#FBF8F0'}; padding: 15px 38px; border-radius: 30px; font-size: 11px; letter-spacing: 2px; text-transform: uppercase;`}>{heroButton}</a>
+    </div>
+  </div>
+
+  <!-- BOOKING STATUS STRIP -->
+  <div class="booking-strip" style="display: flex; align-items: center; justify-content: center; gap: 14px; padding: 18px 26px; background: var(--color-bg-strip); border-top: 0.5px solid var(--color-hairline); border-bottom: 0.5px solid var(--color-hairline); flex-wrap: wrap; font-size: 13px;">
+    <span style="display: inline-flex; align-items: center; gap: 8px; color: var(--color-text); letter-spacing: 2px; text-transform: uppercase;">
+      <span style="width: 6px; height: 6px; border-radius: 50%; background: var(--color-status-dot); display: inline-block;"></span>{t('booking.statusLabel')} 2026
+    </span>
+    <span class="booking-dot" style="color: var(--color-gold);">·</span>
+    <span style="color: #8A6A46; letter-spacing: 0.3px; text-align: center;">
+      {tourCities.map((c, i) => (
+        <>
+          {c.name}{' '}<span style="color: var(--color-gold);">({c.dates})</span>{i < tourCities.length - 1 ? ' · ' : ''}
+        </>
+      ))}
+    </span>
+  </div>
+
+  <!-- PORTFOLIO / WORK -->
+  <div id="work" class="reveal" style="padding: clamp(3rem,6vw,5rem) clamp(20px,5vw,64px);">
+    <div style="text-align: center; margin-bottom: 2.5rem;">
+      <p class="display-serif" style="margin: 0; font-size: 38px; color: var(--color-ink);">
+        <LetterReveal text={t('work.heading')} />
+      </p>
+      <div class="rule-underline" style="height: 0.5px; background: var(--color-gold-bright); margin: 14px auto 0;"></div>
+    </div>
+
+    <!-- Desktop mosaic -->
+    <div class="hidden md:grid" style="grid-template-columns: repeat(6, 1fr); grid-auto-rows: 130px; gap: 14px; max-width: 1180px; margin: 0 auto;">
+      {portfolioMain.map((item, i) => (
+        <div style={`grid-column: span ${DESKTOP_SPANS[i].col}; grid-row: span ${DESKTOP_SPANS[i].row}; overflow: hidden; border-radius: 3px;`}>
+          <div class="zoom-frame" style="width: 100%; height: 100%;">
+            <img src={item.data.image} alt={localized(lang, item.data.imageAlt, item.data.imageAltEn) ?? ''} style="width: 100%; height: 100%; object-fit: cover; display: block;" loading="lazy" />
+          </div>
+        </div>
+      ))}
+      {portfolioZoom && (
+        <div id="portfolio-zoom-source" style="grid-column: span 2; grid-row: span 2; overflow: hidden; border-radius: 3px;">
+          <img src={portfolioZoom.data.image} alt={localized(lang, portfolioZoom.data.imageAlt, portfolioZoom.data.imageAltEn) ?? ''} style="width: 100%; height: 100%; object-fit: cover; display: block;" loading="lazy" />
+        </div>
+      )}
+      <div style="grid-column: span 3; grid-row: span 1; display: flex; align-items: flex-end;">
+        <a href="https://instagram.com/samambaiaana" style="display: inline-block; border: 0.5px solid var(--color-gold); color: var(--color-text); padding: 13px 34px; border-radius: 30px; font-size: 11px; letter-spacing: 2px; text-transform: uppercase;">{t('work.seeMoreInsta')}</a>
+      </div>
+    </div>
+
+    <!-- Desktop-only scroll-zoom spacer (fixed clone lives outside #work — see below) -->
+    <div id="zoom-spacer" class="hidden md:block" style="height: 70vh; position: relative;"></div>
+
+    <!-- Mobile mosaic -->
+    <div class="grid md:hidden" style="grid-template-columns: 1fr 1fr; gap: 10px;">
+      {portfolioMain.map((item, i) => (
+        <div style={`grid-column: span ${MOBILE_SPANS[i].col}; overflow: hidden; border-radius: 3px; margin-top: ${MOBILE_SPANS[i].offset}px;`}>
+          <img src={item.data.image} alt={localized(lang, item.data.imageAlt, item.data.imageAltEn) ?? ''} style={`width: 100%; aspect-ratio: ${MOBILE_SPANS[i].ratio}; object-fit: cover; display: block;`} loading="lazy" />
+        </div>
+      ))}
+      {portfolioZoom && (
+        <div id="portfolio-zoom-source-mobile" style="grid-column: span 2; overflow: hidden; border-radius: 3px;">
+          <img src={portfolioZoom.data.image} alt={localized(lang, portfolioZoom.data.imageAlt, portfolioZoom.data.imageAltEn) ?? ''} style="width: 100%; aspect-ratio: 4/3; object-fit: cover; display: block;" loading="lazy" />
+        </div>
+      )}
+      <a href="https://instagram.com/samambaiaana" style="grid-column: span 2; display: block; text-align: center; border: 0.5px solid var(--color-gold); color: var(--color-text); padding: 13px 34px; border-radius: 30px; font-size: 11px; letter-spacing: 2px; text-transform: uppercase; margin-top: 6px;">{t('work.seeMoreInsta')}</a>
+    </div>
+
+    <!-- Mobile-only scroll-zoom spacer, mirrors #zoom-spacer above for desktop -->
+    <div id="zoom-spacer-mobile" class="block md:hidden" style="height: 70vh; position: relative;"></div>
+  </div>
+
+  <!--
+    Fixed-position zoom clone, deliberately OUTSIDE #work: any ancestor with a
+    non-"none" transform (e.g. `.reveal.revealed { transform: translateY(0) }`)
+    creates a new containing block for `position: fixed` descendants, so
+    nesting this inside the `.reveal`-classed #work section positioned it
+    relative to that section's box instead of the viewport once revealed.
+  -->
+  {portfolioZoom && (
+    <img id="portfolio-zoom-clone" src="/images/portfolio-7-overlay.webp" alt="" style="position: fixed; z-index: 10; overflow: hidden; opacity: 0; pointer-events: none; object-fit: cover; display: none;" />
+  )}
+
+  <!-- ABOUT -->
+  <div id="about" class="reveal" style="position: relative; z-index: 20; background: var(--color-bg); padding: clamp(2.5rem,5vw,4rem) clamp(20px,5vw,64px); border-top: 0.5px solid var(--color-hairline); display: flex; align-items: center; max-width: 1120px; margin: 0 auto;">
+    <img src={portrait} alt={portraitAlt} class="about-portrait" style="flex-shrink: 0; object-fit: cover; border-radius: 4px; width: 100%;" />
+    <div>
+      <div style="font-size: 14px; color: var(--color-gold); letter-spacing: 10px; margin-bottom: 22px;">✦ ✦ ✦</div>
+      <p class="display-serif" style="margin: 0 0 10px; font-size: 36px; color: var(--color-ink);">
+        <LetterReveal text={t('about.heading')} breakAfterWordIndex={3} />
+      </p>
+      <p style="margin: 0 0 16px; font-size: 16px; font-weight: 300; color: var(--color-body); line-height: 1.9; max-width: 560px;">{bioP1}</p>
+      <p style="margin: 0; font-size: 16px; font-weight: 300; color: var(--color-body); line-height: 1.9; max-width: 560px;">{bioP2}</p>
+    </div>
+  </div>
+
+  <!-- WHERE TO FIND ME -->
+  <div class="reveal" style="padding: clamp(2.5rem,5vw,4rem) clamp(20px,5vw,64px) clamp(4rem,8vw,7rem); border-top: 0.5px solid var(--color-hairline); max-width: 1120px; margin: 0 auto;">
+    <p class="display-serif" style="margin: 0 0 22px; font-size: 36px; color: var(--color-ink);">
+      <LetterReveal text={t('where.heading')} />
+    </p>
+    <div class="where-grid" style="display: grid; gap: 110px; align-items: center; min-width: 0;">
+      <div style="font-size: 16px; color: var(--color-body); line-height: 2.2; min-width: 0;">
+        <p style="margin:0; color: var(--color-text); letter-spacing: 1.5px; text-transform: uppercase; font-size: 10px;">{t('where.homeStudio')}</p>
+        <p style="margin:0 0 18px; font-weight: 400;">{t('where.spByAppointment')}</p>
+        <p style="margin:0; color: var(--color-text); letter-spacing: 1.5px; text-transform: uppercase; font-size: 10px;">{t('where.eurotourHeading')}</p>
+        <div style="display: flex; flex-direction: column; gap: 4px; margin-top: 6px; max-width: 280px;">
+          {tourCities.map((city) => (
+            <p style="margin: 0; font-weight: 400; display: flex; flex-wrap: wrap; justify-content: space-between; gap: 4px 12px;"><span>{city.name}</span><span style="color: var(--color-gold);">{city.dates}</span></p>
+          ))}
+        </div>
+      </div>
+      <img src={studioPhoto} alt={studioPhotoAlt} style="width: 100%; height: 360px; object-fit: cover; border-radius: 5px; min-width: 0;" />
+    </div>
+  </div>
+
+  <!-- BOOKING FORM -->
+  <div id="book">
+    <BookingForm lang={lang} cityOptions={CITY_OPTIONS} intro={bookingIntro} contactEmail={contactEmail} illustrationLeft={bookingIllustration} illustrationRight="/images/winged-illustration.webp" />
+  </div>
+
+  <!-- FLASH -->
+  <div id="flash" class="reveal" style="padding: clamp(3rem,6vw,5rem) clamp(20px,5vw,64px); border-top: 0.5px solid var(--color-hairline); max-width: 1120px; margin: 0 auto;">
+    <div style="display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 1.75rem; gap: 12px; flex-wrap: wrap;">
+      <p class="display-serif" style="margin: 0; font-size: 38px; color: var(--color-ink);">
+        <LetterReveal text={t('flash.heading')} />
+      </p>
+      <a href="#book" style="display: inline-block; border: 0.5px solid var(--color-gold); color: var(--color-text); padding: 11px 26px; border-radius: 30px; font-size: 11px; letter-spacing: 1.5px; text-transform: uppercase; white-space: nowrap;">{t('nav.book')} →</a>
+    </div>
+    <p style="margin: 0 0 1.75rem; font-size: 16px; font-weight: 300; color: var(--color-body); line-height: 1.8; max-width: 620px;">{t('flash.subheading')}</p>
+
+    <div id="flash-track" style="display: flex; gap: 18px; overflow-x: auto; scroll-snap-type: x proximity; padding: 4px 4px 18px; scrollbar-width: none;">
+      {flashItems.map((item) => (
+        <div style="position: relative; flex: 0 0 220px; scroll-snap-align: start; background: #FFFEFA; border: 0.5px solid var(--color-hairline-strong); border-radius: 8px; padding: 12px; box-shadow: 0 4px 16px rgba(74,59,36,0.06);">
+          <div style="position: relative;">
+            <img src={item.data.image} alt={localized(lang, item.data.title, item.data.titleEn)} style="width: 100%; aspect-ratio: 1; object-fit: cover; border-radius: 3px; display: block;" loading="lazy" />
+            <FlashStatusBadge lang={lang} status={item.data.status} />
+          </div>
+        </div>
+      ))}
+    </div>
+    <div id="flash-dots" style="display: flex; justify-content: center; gap: 8px; margin-top: 4px;">
+      {flashItems.map((_, i) => (
+        <button type="button" data-dot={i} aria-label="Go to flash design" style="width: 6px; height: 6px; border-radius: 50%; border: none; padding: 0; background: #DCD2BB; cursor: pointer; transition: background 0.25s ease, width 0.25s ease, height 0.25s ease;"></button>
+      ))}
+    </div>
+    <div style="text-align: center; margin-top: 2rem;">
+      <a href="/flash" style="font-size: 12px; letter-spacing: 1.5px; text-transform: uppercase; color: var(--color-text); border-bottom: 0.5px solid var(--color-gold); padding-bottom: 3px;">{t('flash.seeAll')}</a>
+    </div>
+  </div>
+
+  <!-- TESTIMONIALS -->
+  <div class="reveal" style="padding: clamp(3rem,6vw,5rem) clamp(20px,5vw,64px); border-top: 0.5px solid var(--color-hairline); max-width: 1120px; margin: 0 auto;">
+    <div style="text-align: center; margin-bottom: 2.5rem;">
+      <p class="display-serif" style="margin: 0; font-size: 36px; color: var(--color-ink);">
+        <LetterReveal text={t('testimonials.heading')} />
+      </p>
+      <div class="rule-underline" style="height: 0.5px; background: var(--color-gold-bright); margin: 14px auto 0;"></div>
+    </div>
+    <div class="testimonials-grid" style="display: grid; gap: 32px;">
+      {testimonials.map((item) => (
+        <div style="text-align: center;">
+          <p style="margin: 0 0 16px; font-size: 16px; font-weight: 300; color: var(--color-text); line-height: 1.8; font-style: italic;">"{localized(lang, item.data.quote, item.data.quoteEn)}"</p>
+          <p style="margin: 0; font-size: 11px; letter-spacing: 1.5px; text-transform: uppercase; color: #A89A7E;">{item.data.name}</p>
+        </div>
+      ))}
+    </div>
+  </div>
+
+  <!-- FAQ -->
+  <div class="reveal" style="padding: clamp(2.5rem,5vw,4rem) clamp(20px,5vw,64px); border-top: 0.5px solid var(--color-hairline); max-width: 860px; margin: 0 auto;">
+    <p class="display-serif" style="margin: 0 0 20px; font-size: 36px; color: var(--color-ink);">
+      <LetterReveal text={t('faq.heading')} />
+    </p>
+    <div class="rule-underline" style="height: 0.5px; background: var(--color-gold-bright); margin: 0 0 20px;"></div>
+    <div class="faq-list" style="font-size: 16px; color: var(--color-text);">
+      {faqItems.map((item) => (
+        <details class="faq-item" style="border-bottom: 0.5px solid var(--color-hairline);">
+          <summary style="display:flex; justify-content:space-between; align-items:center; padding: 16px 2px; cursor: pointer; list-style: none;">
+            <span style="font-weight:400;">{localized(lang, item.data.question, item.data.questionEn)}</span>
+            <span class="faq-icon" aria-hidden="true" style="font-size:16px; color: #B0A488; font-weight:300;"></span>
+          </summary>
+          <p style="margin: 0 0 18px; padding: 0 2px; font-size: 15px; font-weight: 300; color: var(--color-body); line-height: 1.8; max-width: 560px;">{localized(lang, item.data.answer, item.data.answerEn)}</p>
+        </details>
+      ))}
+    </div>
+  </div>
+
+  <!-- OTHER WORK -->
+  <div class="reveal" style="padding: clamp(2.5rem,5vw,4rem) clamp(20px,5vw,64px); border-top: 0.5px solid var(--color-hairline); max-width: 860px; margin: 0 auto;">
+    <p class="display-serif" style="margin: 0 0 20px; font-size: 36px; color: var(--color-ink);">
+      <LetterReveal text={t('other.heading')} />
+    </p>
+    <div class="other-work-grid" style="display: grid; gap: 14px;">
+      {otherWork.map((item) => (
+        <a href={item.data.url} style="border: 0.5px solid var(--color-hairline-strong); border-radius: 5px; overflow: hidden; text-align: center; background: var(--color-bg); display: block;">
+          <img src={item.data.image} alt={localized(lang, item.data.label, item.data.labelEn)} style="width: 100%; height: 440px; object-fit: cover; display: block;" loading="lazy" />
+          <div style="padding: 20px;">
+            <p style="margin:0 0 6px; font-size:12px; letter-spacing:2px; text-transform:uppercase; color: var(--color-text);">{localized(lang, item.data.label, item.data.labelEn)}</p>
+            <p style="margin:0; font-size:11px; letter-spacing:1px; color: #A89A7E;">{t('other.visitShop')}</p>
+          </div>
+        </a>
+      ))}
+    </div>
+  </div>
+</BaseLayout>
+
+<style>
+  div#about {
+    flex-direction: column;
+    gap: 32px;
+  }
+  .about-portrait {
+    max-width: 340px;
+    height: 340px;
+  }
+  @media (min-width: 768px) {
+    div#about {
+      flex-direction: row;
+      gap: 110px;
+    }
+    .about-portrait {
+      width: 340px;
+      height: 430px;
+    }
+  }
+
+  .where-grid {
+    grid-template-columns: 1fr;
+  }
+  @media (min-width: 768px) {
+    .where-grid {
+      grid-template-columns: 1fr 1.6fr;
+    }
+  }
+
+  .booking-form {
+    grid-template-columns: 1fr;
+  }
+  @media (min-width: 640px) {
+    .booking-form {
+      grid-template-columns: 1fr 1fr;
+    }
+    .booking-input-full {
+      grid-column: 1 / -1;
+    }
+  }
+
+  .testimonials-grid {
+    grid-template-columns: 1fr;
+  }
+  @media (min-width: 768px) {
+    .testimonials-grid {
+      grid-template-columns: repeat(3, 1fr);
+    }
+  }
+
+  .other-work-grid {
+    grid-template-columns: 1fr;
+  }
+  @media (min-width: 640px) {
+    .other-work-grid {
+      grid-template-columns: 1fr 1fr;
+    }
+  }
+
+  .faq-item summary::-webkit-details-marker {
+    display: none;
+  }
+  .faq-icon::before {
+    content: '+';
+  }
+  .faq-item[open] .faq-icon::before {
+    content: '\2212';
+  }
+</style>
+
+<script>
+  // The hero opts out of the shared scroll-reveal observer (it's 100% in
+  // view on load, so that observer would fire immediately and the letter
+  // reveal would finish entirely behind the still-opaque splash screen).
+  // Instead it waits for the splash to actually clear, ported from
+  // SplashScreen.astro's `samambaia:splashDone` signal, plus a short extra
+  // beat so the reveal reads as its own moment rather than a continuation.
+  (function revealHeroAfterSplash() {
+    const heroWrap = document.querySelector('.hero-intro-wrap');
+    if (!heroWrap) return;
+    const reveal = () => setTimeout(() => heroWrap.classList.add('revealed'), 250);
+    if ((window as any).__samambaiaSplashDone) reveal();
+    else window.addEventListener('samambaia:splashDone', reveal, { once: true });
+  })();
+
+  // Flash carousel dot pagination, synced to horizontal scroll position.
+  const track = document.getElementById('flash-track');
+  const dots = Array.from(document.querySelectorAll<HTMLButtonElement>('#flash-dots [data-dot]'));
+  const CARD_W = 220 + 18;
+
+  function setActiveDot(idx: number) {
+    dots.forEach((dot, i) => {
+      const active = i === idx;
+      dot.style.background = active ? 'var(--color-ink)' : '#DCD2BB';
+      dot.style.width = active ? '8px' : '6px';
+      dot.style.height = active ? '8px' : '6px';
+    });
+  }
+
+  if (track && dots.length) {
+    dots.forEach((dot, i) => {
+      dot.addEventListener('click', () => {
+        track.scrollTo({ left: i * CARD_W, behavior: 'smooth' });
+      });
+    });
+    track.addEventListener(
+      'scroll',
+      () => {
+        const idx = Math.round(track.scrollLeft / CARD_W);
+        setActiveDot(Math.max(0, Math.min(dots.length - 1, idx)));
+      },
+      { passive: true }
+    );
+    setActiveDot(0);
+  }
+
+  // Portfolio scroll-zoom effect, ported from the handoff's onScroll handler:
+  // the last portfolio tile detaches to position:fixed and interpolates from
+  // its grid rect to full-viewport as the user scrolls ~1.1 viewport-heights
+  // through the spacer, then crossfades out as the About section approaches.
+  // Desktop and mobile each render their own source tile (only one is ever
+  // visible at a time via the "hidden md:grid" / "grid md:hidden" split), so
+  // the effect picks whichever one is live for the current breakpoint.
+  const desktopSourceEl = document.getElementById('portfolio-zoom-source');
+  const mobileSourceEl = document.getElementById('portfolio-zoom-source-mobile');
+  const clone = document.getElementById('portfolio-zoom-clone') as HTMLImageElement | null;
+  const aboutEl = document.getElementById('about');
+  const mql = window.matchMedia('(min-width: 768px)');
+
+  function currentSourceEl(): HTMLElement | null {
+    return mql.matches ? desktopSourceEl : mobileSourceEl;
+  }
+
+  if ((desktopSourceEl || mobileSourceEl) && clone && aboutEl) {
+    let engaged = false;
+    let progress = 0;
+    let engageScrollY = 0;
+    let startRect: { top: number; left: number; width: number; height: number } | null = null;
+    let fadeOpacity = 1;
+    let activeSourceEl: HTMLElement | null = null;
+
+    function updateClone() {
+      if (!clone) return;
+      if (!engaged || !startRect) {
+        clone.style.display = 'none';
+        clone.style.opacity = '0';
+        return;
+      }
+      const vw = window.innerWidth;
+      const vh = window.innerHeight;
+      const left = startRect.left * (1 - progress);
+      const top = startRect.top * (1 - progress);
+      const width = startRect.width + (vw - startRect.width) * progress;
+      const height = startRect.height + (vh - startRect.height) * progress;
+      const radius = 3 * (1 - progress);
+      clone.style.display = 'block';
+      clone.style.left = `${left}px`;
+      clone.style.top = `${top}px`;
+      clone.style.width = `${width}px`;
+      clone.style.height = `${height}px`;
+      clone.style.borderRadius = `${radius}px`;
+      clone.style.opacity = String(fadeOpacity);
+    }
+
+    function disengage() {
+      engaged = false;
+      if (activeSourceEl) activeSourceEl.style.opacity = '1';
+      activeSourceEl = null;
+    }
+
+    function onScroll() {
+      if (!engaged) {
+        const sourceEl = currentSourceEl();
+        if (!sourceEl) return;
+        const r = sourceEl.getBoundingClientRect();
+        if (r.top <= window.innerHeight * 0.55 && r.bottom > 0) {
+          engaged = true;
+          activeSourceEl = sourceEl;
+          startRect = { top: r.top, left: r.left, width: r.width, height: r.height };
+          engageScrollY = window.scrollY;
+          progress = 0;
+          sourceEl.style.opacity = '0';
+        }
+      } else {
+        const dist = window.innerHeight * 1.1;
+        const p = (window.scrollY - engageScrollY) / dist;
+        const aboutTop = aboutEl.getBoundingClientRect().top;
+        const fadeDistance = 260;
+        fadeOpacity = Math.max(0, Math.min(1, aboutTop / fadeDistance));
+        if (p < -0.08) {
+          progress = 0;
+          fadeOpacity = 1;
+          disengage();
+        } else if (p >= 1 && aboutTop <= -fadeDistance) {
+          disengage();
+        } else {
+          progress = Math.max(0, Math.min(1, p));
+        }
+      }
+      updateClone();
+    }
+
+    window.addEventListener('scroll', onScroll, { passive: true });
+    window.addEventListener('resize', onScroll);
+    // A breakpoint flip mid-engagement (orientation change, devtools resize)
+    // would otherwise leave the clone sized from the other layout's rect —
+    // cleaner to just reset and let the next scroll tick re-engage fresh.
+    mql.addEventListener('change', () => {
+      progress = 0;
+      fadeOpacity = 1;
+      disengage();
+      updateClone();
+    });
+    onScroll();
+  }
+</script>

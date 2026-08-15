@@ -1,0 +1,16 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { getEntry } from 'astro:content';
+import { useTranslations } from '../i18n/ui';
+
+const t = useTranslations('pt');
+const privacy = await getEntry('singletons', 'privacy').catch(() => null);
+const body = privacy?.data.body ?? '';
+---
+
+<BaseLayout title={t('common.privacy')} description="" noindex={false} simpleHeader={true} noSplash={true}>
+  <section style="padding: clamp(2.5rem,5vw,4rem) clamp(20px,5vw,64px); max-width: 720px; margin: 0 auto;">
+    <p class="display-serif" style="margin: 0 0 24px; font-size: 36px; color: var(--color-ink);">{t('common.privacy')}</p>
+    <p style="white-space: pre-line; color: var(--color-body); font-weight: 300; line-height: 1.9;">{body}</p>
+  </section>
+</BaseLayout>

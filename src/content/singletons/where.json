@@ -1,0 +1,12 @@
+{
+  "studioPhoto": "/images/studio-photo.webp",
+  "studioPhotoAlt": "Foto de Ana em seu estúdio",
+  "studioPhotoAltEn": "Photo of Ana in her studio",
+  "tourCities": [
+    { "name": "Zurich", "dates": "Jul 21–25" },
+    { "name": "Brussels", "dates": "Jul 25–30" },
+    { "name": "Amsterdam", "dates": "Aug 1–5" },
+    { "name": "London", "dates": "Aug 5–10" },
+    { "name": "Lisbon", "dates": "Aug 11–20" }
+  ]
+}

@@ -1,0 +1,19 @@
+---
+import { useTranslations, type Lang } from '../i18n/ui';
+import { FLASH_STATUS_COLORS, FLASH_STATUS_LABEL_KEY, type FlashStatus } from '../lib/flashStatus';
+
+interface Props {
+  lang: Lang;
+  status?: FlashStatus;
+}
+
+const { lang, status } = Astro.props;
+const t = useTranslations(lang);
+---
+
+{status && (
+  <div style={`position: absolute; top: 10px; left: 10px; z-index: 2; display: inline-flex; align-items: center; gap: 6px; background: rgba(251,248,240,0.92); border-radius: 20px; padding: 5px 10px; box-shadow: 0 2px 8px rgba(74,59,36,0.12);`}>
+    <span style={`width: 7px; height: 7px; border-radius: 50%; background: ${FLASH_STATUS_COLORS[status]}; flex-shrink: 0;`}></span>
+    <span style={`font-size: 10px; letter-spacing: 1px; text-transform: uppercase; font-weight: 500; color: ${FLASH_STATUS_COLORS[status]};`}>{t(FLASH_STATUS_LABEL_KEY[status])}</span>
+  </div>
+)}

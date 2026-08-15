@@ -1,0 +1,65 @@
+---
+/**
+ * Splits text into per-character <span class="letter"> elements, each with
+ * its own `--d` stagger delay — ported from the handoff's `letterReveal()`.
+ * Rendering is static (SSR); the actual reveal-on-scroll is driven purely by
+ * CSS off the ancestor `.reveal` section's `.revealed` class (see
+ * global.css and the shared observer script in BaseLayout.astro), so this
+ * component itself carries no client JS.
+ *
+ * Each word's letters are nested inside their own `display: inline-block`
+ * wrapper, atomic as far as the browser's line-breaking is concerned. Without
+ * that, every letter is its own separate inline-block box and the browser is
+ * free to wrap the line between *any* two letters — not just at the actual
+ * word boundaries — producing mid-word breaks ("beyondt" / "he skin")
+ * whenever the heading doesn't fit on one line.
+ *
+ * Must be placed inside an element carrying the `reveal` class.
+ */
+interface Props {
+  text: string;
+  /** Word index (0-based) after which to force a <br> on narrow viewports only. */
+  breakAfterWordIndex?: number;
+  /** Per-word color override, e.g. two-tone hero headlines. */
+  wordColor?: (wordIndex: number, wordCount: number) => string | null;
+  /** Seconds between each letter's reveal. */
+  staggerMs?: number;
+}
+
+const { text, breakAfterWordIndex, wordColor, staggerMs = 25 } = Astro.props;
+
+const NBSP = String.fromCharCode(160);
+
+const words = text.split(' ');
+let i = 0;
+const wordGroups = words.map((word, wi) => {
+  const color = wordColor ? wordColor(wi, words.length) : null;
+  const letters = [...word].map((c) => ({ char: c, color, delay: `${(i++ * staggerMs) / 1000}s` }));
+  const spaceDelay = `${(i++ * staggerMs) / 1000}s`;
+  return {
+    letters,
+    hasSpaceAfter: wi < words.length - 1,
+    spaceIsBreak: wi === breakAfterWordIndex,
+    spaceDelay,
+  };
+});
+---
+{wordGroups.map((group) => (
+  <>
+    <span class="word" style="display: inline-block;">
+      {group.letters.map((l) => (
+        <span class="letter" style={{ '--d': l.delay, color: l.color ?? undefined }}>{l.char}</span>
+      ))}
+    </span>
+    {group.hasSpaceAfter && (
+      <>
+        {group.spaceIsBreak && <br class="hero-mobile-break" />}
+        <span
+          class="letter"
+          class:list={[group.spaceIsBreak && 'hero-break-space']}
+          style={{ '--d': group.spaceDelay }}
+        >{NBSP}</span>
+      </>
+    )}
+  </>
+))}

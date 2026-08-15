@@ -1,0 +1,201 @@
+@import "tailwindcss";
+
+/*
+ * Two typefaces, both latin-ext (covers Portuguese diacritics — ã, ç, é,
+ * etc. — which the plain "latin" subset does not) rather than the design
+ * handoff's Google Fonts CDN link tags: self-hosting avoids a third-party
+ * request and matches the sibling suleika-portfolio project's approach.
+ *
+ *   Cormorant Garamond    every section heading, hero headline (italic only) —
+ *                         weight 400, except the nav wordmark specifically,
+ *                         which the handoff sets to 300 for a lighter touch
+ *                         at that small size.
+ *   Zen Kaku Gothic New   body copy at 300; nav links, buttons, uppercase
+ *                         labels, and a few label-like lines (tour dates,
+ *                         FAQ question, studio address) at the unset
+ *                         default (400) — matches the handoff's own split.
+ *
+ * Both families are self-hosted from the actual files Google Fonts serves
+ * (downloaded, subset to latin-ext, converted to WOFF2 with fonttools)
+ * rather than via @fontsource — the @fontsource builds render visibly
+ * different letterforms/metrics from fonts.google.com's own files, so this
+ * sidesteps that mismatch entirely rather than trying to explain it.
+ * Zen Kaku Gothic New's original TTFs ship the full CJK glyph set (~2.3MB
+ * each); subsetting to latin-ext brings each weight down to ~12KB.
+ */
+@font-face {
+  font-family: 'Cormorant Garamond';
+  font-style: italic;
+  font-weight: 300;
+  font-display: swap;
+  src: url('/fonts/cormorant-garamond-italic-300.woff2') format('woff2');
+}
+@font-face {
+  font-family: 'Cormorant Garamond';
+  font-style: italic;
+  font-weight: 400;
+  font-display: swap;
+  src: url('/fonts/cormorant-garamond-italic-400.woff2') format('woff2');
+}
+@font-face {
+  font-family: 'Zen Kaku Gothic New';
+  font-style: normal;
+  font-weight: 300;
+  font-display: swap;
+  src: url('/fonts/zen-kaku-gothic-new-300.woff2') format('woff2');
+}
+@font-face {
+  font-family: 'Zen Kaku Gothic New';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url('/fonts/zen-kaku-gothic-new-400.woff2') format('woff2');
+}
+
+@layer base {
+  :root {
+    /* Design tokens from the Ana Beatriz / Samambaia Ana handoff. */
+    --color-bg: #FBF8F0;
+    --color-bg-panel: #F7F1E5;
+    --color-bg-strip: #F2ECDD;
+    --color-ink: #2E3327;
+    --color-text: #4A3B24;
+    --color-body: #6E6250;
+    --color-label: #9A7A54;
+    --color-gold: #B58E5E;
+    --color-gold-bright: #C9A15A;
+    --color-hairline: #EDE6D6;
+    --color-hairline-strong: #E0D6C0;
+    --color-footer-bg: #2E3327;
+    --color-footer-text: #F3ECDD;
+    --color-footer-text-dim: #E8E0CF;
+    --color-footer-text-dimmer: #9A9584;
+    --color-status-dot: #6E8B5A;
+    --color-error: #B3413A;
+  }
+
+  html {
+    scroll-behavior: smooth;
+    background-color: var(--color-bg);
+    color: var(--color-text);
+    font-family: 'Zen Kaku Gothic New', sans-serif;
+  }
+
+  body {
+    background-color: var(--color-bg);
+    overflow-x: hidden;
+  }
+
+  input:-webkit-autofill,
+  input:-webkit-autofill:hover,
+  input:-webkit-autofill:focus,
+  textarea:-webkit-autofill,
+  textarea:-webkit-autofill:hover,
+  textarea:-webkit-autofill:focus {
+    -webkit-text-fill-color: var(--color-text);
+    -webkit-box-shadow: 0 0 0 1000px var(--color-bg) inset;
+    box-shadow: 0 0 0 1000px var(--color-bg) inset;
+    caret-color: var(--color-text);
+    transition: background-color 100000s ease-in-out 0s;
+  }
+}
+
+@layer components {
+  /* Every display/heading setting on the site goes through this. */
+  .display-serif {
+    font-family: 'Cormorant Garamond', Georgia, serif;
+    font-style: italic;
+    font-weight: 400;
+  }
+
+  .zoom-frame {
+    overflow: hidden;
+  }
+
+  @media (hover: hover) and (prefers-reduced-motion: no-preference) {
+    .zoom-frame img {
+      transition: transform 0.5s ease;
+    }
+
+    .zoom-frame:hover img {
+      transform: scale(1.08);
+    }
+  }
+
+  /*
+   * Scroll-reveal, ported from the handoff's IntersectionObserver-driven
+   * state (threshold 0.15, fires once). `.reveal` on a section fades/slides
+   * the block in; `.letter` spans inside it (written by LetterReveal.astro)
+   * animate individually via their own --d stagger delay; `.rule-underline`
+   * grows 0->34px. All three key off the single `.revealed` class the
+   * shared observer script (BaseLayout.astro) adds once per section.
+   */
+  .reveal {
+    opacity: 0;
+    transform: translateY(24px);
+    transition: opacity 0.9s cubic-bezier(0.16, 1, 0.3, 1), transform 0.9s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  .reveal.revealed {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  .reveal .letter {
+    display: inline-block;
+    opacity: 0;
+    transform: translateY(8px);
+    transition: opacity 0.4s ease var(--d, 0s), transform 0.4s ease var(--d, 0s);
+  }
+  .reveal.revealed .letter {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  .reveal .rule-underline {
+    width: 0;
+    transition: width 0.8s cubic-bezier(0.16, 1, 0.3, 1) 0.2s;
+  }
+  .reveal.revealed .rule-underline {
+    width: 34px;
+  }
+}
+
+@keyframes heroDrift1 {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  50% { transform: translate(-8px, -14px) scale(1.06); }
+}
+@keyframes sparkleTwinkle {
+  0%, 100% { opacity: 0.3; }
+  50% { opacity: 1; }
+}
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.hero-mobile-break {
+  display: none;
+}
+@media (max-width: 640px) {
+  .hero-mobile-break {
+    display: block;
+  }
+  .hero-headline {
+    font-size: clamp(56px, 13vw, 72px) !important;
+    line-height: 1.25 !important;
+  }
+  .hero-break-space {
+    display: none !important;
+  }
+  .hero-subheadline {
+    white-space: normal !important;
+  }
+  .booking-strip {
+    flex-direction: column;
+    gap: 6px !important;
+    text-align: center;
+  }
+  .booking-dot {
+    display: none;
+  }
+}
