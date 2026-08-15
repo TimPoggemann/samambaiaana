@@ -134,7 +134,7 @@ const schema = graph(origin, lang, [
         <span style="display: inline-block; animation: sparkleTwinkle 2.2s ease-in-out 0.35s infinite;">✦</span>
         <span style="display: inline-block; animation: sparkleTwinkle 2.2s ease-in-out 0.7s infinite;">✦</span>
       </div>
-      <p class="hero-headline" style={`margin: 0 0 22px; font-family: 'Cormorant Garamond', serif; font-size: clamp(52px,7.8vw,94px); font-weight: 400; font-style: italic; line-height: 1.04; color: ${isDarkMedia ? '#FBF8F0' : 'var(--color-ink)'}; text-shadow: ${isDarkMedia ? '0 2px 20px rgba(0,0,0,0.35)' : '0 2px 24px rgba(251,248,240,0.6)'};`}>
+      <p class="hero-headline" style={`margin: 0 0 22px; font-family: 'Cormorant Garamond', serif; font-size: var(--fs-hero); font-weight: 400; font-style: italic; line-height: 1.04; color: ${isDarkMedia ? '#FBF8F0' : 'var(--color-ink)'}; text-shadow: ${isDarkMedia ? '0 2px 20px rgba(0,0,0,0.35)' : '0 2px 24px rgba(251,248,240,0.6)'};`}>
         <LetterReveal text={heroHeading} breakAfterWordIndex={1} wordColor={heroWordColor} staggerMs={45} />
       </p>
       <p class="hero-subheadline" style={`margin: 0 0 34px; font-size: 17px; font-weight: 300; letter-spacing: 0.1px; color: ${isDarkMedia ? '#F0EAD9' : 'var(--color-text)'}; line-height: 1.9; white-space: nowrap;`}>{heroIntro}</p>
@@ -160,7 +160,7 @@ const schema = graph(origin, lang, [
   <!-- PORTFOLIO / WORK -->
   <div id="work" class="reveal" style="padding: clamp(3rem,6vw,5rem) clamp(20px,5vw,64px);">
     <div style="text-align: center; margin-bottom: 2.5rem;">
-      <p class="display-serif" style="margin: 0; font-size: 38px; color: var(--color-ink);">
+      <p class="display-serif" style="margin: 0; font-size: var(--fs-h2); color: var(--color-ink);">
         <LetterReveal text={t('work.heading')} />
       </p>
       <div class="rule-underline" style="height: 0.5px; background: var(--color-gold-bright); margin: 14px auto 0;"></div>
@@ -223,21 +223,21 @@ const schema = graph(origin, lang, [
     <img src={portrait} alt={portraitAlt} class="about-portrait" style="flex-shrink: 0; object-fit: cover; border-radius: 4px; width: 100%;" />
     <div>
       <div style="font-size: 14px; color: var(--color-gold); letter-spacing: 10px; margin-bottom: 22px;">✦ ✦ ✦</div>
-      <p class="display-serif about-heading" style="margin: 0 0 10px; font-size: 36px; color: var(--color-ink);">
+      <p class="display-serif" style="margin: 0 0 10px; font-size: var(--fs-h2); color: var(--color-ink);">
         <LetterReveal text={t('about.heading')} breakAfterWordIndex={2} />
       </p>
-      <p style="margin: 0 0 16px; font-size: 16px; font-weight: 300; color: var(--color-body); line-height: 1.9; max-width: 560px;">{bioP1}</p>
-      <p style="margin: 0; font-size: 16px; font-weight: 300; color: var(--color-body); line-height: 1.9; max-width: 560px;">{bioP2}</p>
+      <p style="margin: 0 0 16px; font-size: var(--fs-body); font-weight: 300; color: var(--color-body); line-height: 1.9; max-width: 560px;">{bioP1}</p>
+      <p style="margin: 0; font-size: var(--fs-body); font-weight: 300; color: var(--color-body); line-height: 1.9; max-width: 560px;">{bioP2}</p>
     </div>
   </div>
 
   <!-- WHERE TO FIND ME -->
   <div class="reveal" style="padding: clamp(2.5rem,5vw,4rem) clamp(20px,5vw,64px) clamp(4rem,8vw,7rem); border-top: 0.5px solid var(--color-hairline); max-width: 1120px; margin: 0 auto;">
-    <p class="display-serif" style="margin: 0 0 22px; font-size: 36px; color: var(--color-ink);">
+    <p class="display-serif" style="margin: 0 0 22px; font-size: var(--fs-h2); color: var(--color-ink);">
       <LetterReveal text={t('where.heading')} />
     </p>
     <div class="where-grid" style="display: grid; gap: 110px; align-items: center; min-width: 0;">
-      <div style="font-size: 16px; color: var(--color-body); line-height: 2.2; min-width: 0;">
+      <div style="font-size: var(--fs-body); color: var(--color-body); line-height: 2.2; min-width: 0;">
         <p style="margin:0; color: var(--color-text); letter-spacing: 1.5px; text-transform: uppercase; font-size: 10px;">{t('where.homeStudio')}</p>
         <p style="margin:0 0 18px; font-weight: 400;">{t('where.spByAppointment')}</p>
         <p style="margin:0; color: var(--color-text); letter-spacing: 1.5px; text-transform: uppercase; font-size: 10px;">{t('where.eurotourHeading')}</p>
@@ -259,12 +259,12 @@ const schema = graph(origin, lang, [
   <!-- FLASH -->
   <div id="flash" class="reveal" style="padding: clamp(3rem,6vw,5rem) clamp(20px,5vw,64px); border-top: 0.5px solid var(--color-hairline); max-width: 1120px; margin: 0 auto;">
     <div style="display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 1.75rem; gap: 12px; flex-wrap: wrap;">
-      <p class="display-serif" style="margin: 0; font-size: 38px; color: var(--color-ink);">
+      <p class="display-serif" style="margin: 0; font-size: var(--fs-h2); color: var(--color-ink);">
         <LetterReveal text={t('flash.heading')} />
       </p>
       <a href="#book" style="display: inline-block; border: 0.5px solid var(--color-gold); color: var(--color-text); padding: 11px 26px; border-radius: 30px; font-size: 11px; letter-spacing: 1.5px; text-transform: uppercase; white-space: nowrap;">{t('nav.book')} →</a>
     </div>
-    <p style="margin: 0 0 1.75rem; font-size: 16px; font-weight: 300; color: var(--color-body); line-height: 1.8; max-width: 620px;">{t('flash.subheading')}</p>
+    <p style="margin: 0 0 1.75rem; font-size: var(--fs-body); font-weight: 300; color: var(--color-body); line-height: 1.8; max-width: 620px;">{t('flash.subheading')}</p>
 
     <div id="flash-track" style="display: flex; gap: 18px; overflow-x: auto; scroll-snap-type: x proximity; padding: 4px 4px 18px; scrollbar-width: none;">
       {flashItems.map((item) => (
@@ -289,7 +289,7 @@ const schema = graph(origin, lang, [
   <!-- TESTIMONIALS -->
   <div class="reveal" style="padding: clamp(3rem,6vw,5rem) clamp(20px,5vw,64px); border-top: 0.5px solid var(--color-hairline); max-width: 1120px; margin: 0 auto;">
     <div style="text-align: center; margin-bottom: 2.5rem;">
-      <p class="display-serif" style="margin: 0; font-size: 36px; color: var(--color-ink);">
+      <p class="display-serif" style="margin: 0; font-size: var(--fs-h2); color: var(--color-ink);">
         <LetterReveal text={t('testimonials.heading')} />
       </p>
       <div class="rule-underline" style="height: 0.5px; background: var(--color-gold-bright); margin: 14px auto 0;"></div>
@@ -297,7 +297,7 @@ const schema = graph(origin, lang, [
     <div class="testimonials-grid" style="display: grid; gap: 32px;">
       {testimonials.map((item) => (
         <div style="text-align: center;">
-          <p style="margin: 0 0 16px; font-size: 16px; font-weight: 300; color: var(--color-text); line-height: 1.8; font-style: italic;">"{localized(lang, item.data.quote, item.data.quoteEn)}"</p>
+          <p style="margin: 0 0 16px; font-size: var(--fs-body); font-weight: 300; color: var(--color-text); line-height: 1.8; font-style: italic;">"{localized(lang, item.data.quote, item.data.quoteEn)}"</p>
           <p style="margin: 0; font-size: 11px; letter-spacing: 1.5px; text-transform: uppercase; color: #A89A7E;">{item.data.name}</p>
         </div>
       ))}
@@ -306,18 +306,18 @@ const schema = graph(origin, lang, [
 
   <!-- FAQ -->
   <div class="reveal" style="padding: clamp(2.5rem,5vw,4rem) clamp(20px,5vw,64px); border-top: 0.5px solid var(--color-hairline); max-width: 860px; margin: 0 auto;">
-    <p class="display-serif" style="margin: 0 0 20px; font-size: 36px; color: var(--color-ink);">
+    <p class="display-serif" style="margin: 0 0 20px; font-size: var(--fs-h2); color: var(--color-ink);">
       <LetterReveal text={t('faq.heading')} />
     </p>
     <div class="rule-underline" style="height: 0.5px; background: var(--color-gold-bright); margin: 0 0 20px;"></div>
-    <div class="faq-list" style="font-size: 16px; color: var(--color-text);">
+    <div class="faq-list" style="font-size: var(--fs-body); color: var(--color-text);">
       {faqItems.map((item) => (
         <details class="faq-item" style="border-bottom: 0.5px solid var(--color-hairline);">
           <summary style="display:flex; justify-content:space-between; align-items:center; padding: 16px 2px; cursor: pointer; list-style: none;">
             <span style="font-weight:400;">{localized(lang, item.data.question, item.data.questionEn)}</span>
             <span class="faq-icon" aria-hidden="true" style="font-size:16px; color: #B0A488; font-weight:300;"></span>
           </summary>
-          <p style="margin: 0 0 18px; padding: 0 2px; font-size: 15px; font-weight: 300; color: var(--color-body); line-height: 1.8; max-width: 560px;">{localized(lang, item.data.answer, item.data.answerEn)}</p>
+          <p style="margin: 0 0 18px; padding: 0 2px; font-size: var(--fs-body); font-weight: 300; color: var(--color-body); line-height: 1.8; max-width: 560px;">{localized(lang, item.data.answer, item.data.answerEn)}</p>
         </details>
       ))}
     </div>
@@ -325,7 +325,7 @@ const schema = graph(origin, lang, [
 
   <!-- OTHER WORK -->
   <div class="reveal" style="padding: clamp(2.5rem,5vw,4rem) clamp(20px,5vw,64px); border-top: 0.5px solid var(--color-hairline); max-width: 860px; margin: 0 auto;">
-    <p class="display-serif" style="margin: 0 0 20px; font-size: 36px; color: var(--color-ink);">
+    <p class="display-serif" style="margin: 0 0 20px; font-size: var(--fs-h2); color: var(--color-ink);">
       <LetterReveal text={t('other.heading')} />
     </p>
     <div class="other-work-grid" style="display: grid; gap: 14px;">

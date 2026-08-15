@@ -109,22 +109,41 @@ const NAME = 'Samambaia Ana';
   }
 
   if (splash && wordEl) {
-    // Split the wordmark into per-letter spans. Each letter's own
-    // transition-delay (--d) starts the stagger at 0.75s — after the logo
-    // and kicker have finished fading in — so the beats read as sequential.
+    // Split the wordmark into per-letter spans, each word's letters nested
+    // inside their own display:inline-block wrapper — same technique as
+    // LetterReveal.astro. Without that wrapper, "Samambaia Ana" is just a
+    // flat run of isolated inline-block letter spans with no word-boundary
+    // information, so the browser is free to wrap the line between *any*
+    // two letters, not just at an actual word break (e.g. "An" / "a"
+    // instead of "Samambaia" / "Ana"). Each letter's own transition-delay
+    // (--d) starts the stagger at 0.75s — after the logo and kicker have
+    // finished fading in — so the beats read as sequential.
     const text = wordEl.textContent ?? '';
     const NAME_START = 0.75;
     const NAME_STAGGER = 0.055;
     wordEl.textContent = '';
-    [...text].forEach((ch, i) => {
-      const span = document.createElement('span');
-      span.className = 'letter';
-      span.style.setProperty('--d', `${(NAME_START + i * NAME_STAGGER).toFixed(3)}s`);
-      // A plain space is the sole content of an inline-block span, so normal
-      // whitespace-collapsing rules trim it to zero width; a non-breaking
-      // space is exempt from that collapsing and keeps the gap visible.
-      span.textContent = ch === ' ' ? ' ' : ch;
-      wordEl.appendChild(span);
+    let i = 0;
+    text.split(' ').forEach((word, wi, words) => {
+      const wordSpan = document.createElement('span');
+      wordSpan.style.display = 'inline-block';
+      [...word].forEach((ch) => {
+        const span = document.createElement('span');
+        span.className = 'letter';
+        span.style.setProperty('--d', `${(NAME_START + i++ * NAME_STAGGER).toFixed(3)}s`);
+        span.textContent = ch;
+        wordSpan.appendChild(span);
+      });
+      wordEl.appendChild(wordSpan);
+      if (wi < words.length - 1) {
+        const spaceSpan = document.createElement('span');
+        spaceSpan.className = 'letter';
+        spaceSpan.style.setProperty('--d', `${(NAME_START + i++ * NAME_STAGGER).toFixed(3)}s`);
+        // A plain space is the sole content of an inline-block span, so
+        // normal whitespace-collapsing rules trim it to zero width; a
+        // non-breaking space is exempt and keeps the gap visible.
+        spaceSpan.textContent = ' ';
+        wordEl.appendChild(spaceSpan);
+      }
     });
 
     const alreadySeen = sessionStorage.getItem(KEY);

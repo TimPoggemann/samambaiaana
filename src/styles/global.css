@@ -72,6 +72,18 @@
     --color-footer-text-dimmer: #9A9584;
     --color-status-dot: #6E8B5A;
     --color-error: #B3413A;
+
+    /*
+     * One type scale, referenced everywhere via var() instead of each
+     * section carrying its own slightly-different literal (36px here,
+     * 38px there, 40px on the booking form) — so "section heading" always
+     * means the same size, not four values that happen to look similar.
+     */
+    --fs-hero: clamp(52px, 7.8vw, 94px); /* homepage hero headline, desktop+ */
+    --fs-hero-mobile: clamp(44px, 13.8vw, 60px); /* homepage hero headline, <=640px */
+    --fs-h1: clamp(38px, 6vw, 58px); /* page-level heading with no hero media, e.g. /flash title */
+    --fs-h2: clamp(26px, 6.5vw, 36px); /* in-page section headings (About, Where, Flash, Booking, ...) */
+    --fs-body: 16px; /* paragraph copy */
   }
 
   html {
@@ -181,11 +193,8 @@
     display: block;
   }
   .hero-headline {
-    font-size: clamp(38px, 10.5vw, 54px) !important;
+    font-size: var(--fs-hero-mobile) !important;
     line-height: 1.25 !important;
-  }
-  .about-heading {
-    font-size: clamp(24px, 7.5vw, 32px) !important;
   }
   .hero-subheadline {
     white-space: normal !important;
