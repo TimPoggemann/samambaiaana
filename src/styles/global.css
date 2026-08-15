@@ -196,6 +196,12 @@
     font-size: var(--fs-hero-mobile) !important;
     line-height: 1.25 !important;
   }
+  /* The forced <br> above already provides the line break here, so the
+     space that would otherwise sit before it is hidden — without this it
+     would show up as a leading space at the start of the second line. */
+  .hero-break-space {
+    display: none !important;
+  }
   .hero-subheadline {
     white-space: normal !important;
   }

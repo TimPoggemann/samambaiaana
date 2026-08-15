@@ -77,8 +77,12 @@ for (const group of wordGroups) {
               <span class="letter" style={{ '--d': l.delay, color: l.color ?? undefined }}>{l.char}</span>
             ))}
           </span>
-          {group.hasSpaceAfter && !group.isBreakPoint && (
-            <span class="letter" style={{ '--d': group.spaceDelay }}>{NBSP}</span>
+          {group.hasSpaceAfter && (
+            <span
+              class="letter"
+              class:list={[group.isBreakPoint && 'hero-break-space']}
+              style={{ '--d': group.spaceDelay }}
+            >{NBSP}</span>
           )}
         </>
       ))}
