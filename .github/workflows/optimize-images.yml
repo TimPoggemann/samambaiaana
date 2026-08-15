@@ -1,0 +1,37 @@
+name: Optimize images
+
+# Keystatic uploads land in the repo byte-for-byte -- its image field has no
+# compression, format or size options -- so a photo straight off a phone would
+# otherwise ship at full weight. This re-encodes anything new to webp, caps the
+# width, and rewrites the CMS content paths if a file changed extension.
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'public/images/**'
+
+# The job pushes a follow-up commit, so it needs write access.
+permissions:
+  contents: write
+
+concurrency:
+  group: optimize-images
+  cancel-in-progress: false
+
+jobs:
+  optimize:
+    # Skip our own commits, otherwise the push above retriggers this workflow.
+    if: ${{ !contains(github.event.head_commit.message, '[skip-optimize]') }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - run: npm ci
+
+      - run: bash scripts/ci-optimize.sh
