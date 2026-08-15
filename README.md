@@ -33,8 +33,8 @@ Single page (`/` and `/en/`) built from Keystatic singletons (hero, about, where
 This was scaffolded and built out from a design handoff in one session — the code is real and tested (`npm run build` passes, verified in-browser desktop + mobile, PT + EN), but several things need real business information or external account setup that only the owner can provide:
 
 - **Domain**: `astro.config.mjs` (`site`) and `src/seo/defaults.ts` (`SITE_URL`) use a placeholder `https://samambaiaana.com` — update both to the real domain once registered.
-- **Keystatic Cloud project**: `keystatic.config.ts` has a placeholder `cloud.project` slug (`samambaia-ana-tattoo/samambaia-ana-tattoo`) — register the real project at [keystatic.cloud](https://keystatic.cloud) and update it, or Keystatic won't authenticate.
-- **GitHub repo + Cloudflare Pages**: this is a local git repo only (`git init`, no commits yet, no remote). Needs a GitHub repo and a Cloudflare Pages project pointed at it (see `wrangler.toml` for the project name convention).
+- ~~**Keystatic Cloud project**~~ — done: `cloud.project` in `keystatic.config.ts` points at the real `samambaiaana/samambaiaana` project.
+- ~~**GitHub repo + Cloudflare Pages**~~ — done: pushed to [github.com/TimPoggemann/samambaiaana](https://github.com/TimPoggemann/samambaiaana), deployed via Cloudflare Pages.
 - **Resend / contact form env vars**: `RESEND_API_KEY`, `CONTACT_TO`, `CONTACT_FROM` — see `.env.example`. Nothing sends until these are set as Cloudflare Pages secrets (Production **and** Preview).
 - **Privacy policy / terms of use**: `src/content/singletons/privacy.json` and `terms.json` are placeholder text. These need real LGPD-compliant copy (this is a Brazil-based business) before launch — not a legal review, just noting the placeholder needs replacing by someone qualified to write it.
 - **Business details in JSON-LD**: `src/seo/schema.ts`'s `business()` has no street address (left blank rather than guessed) and no phone number.

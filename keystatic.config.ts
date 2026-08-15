@@ -61,10 +61,7 @@ function seoPageFields(page: SeoPage, pageLabel: string) {
 
 export default config({
   storage: { kind: 'cloud' },
-  // TODO: register this project on keystatic.cloud and replace the slug below
-  // (format "team/project") — this is a placeholder and Keystatic will not
-  // authenticate until it's set to the real one.
-  cloud: { project: 'samambaia-ana-tattoo/samambaia-ana-tattoo' },
+  cloud: { project: 'samambaiaana/samambaiaana' },
 
   singletons: {
     hero: singleton({
