@@ -33,15 +33,15 @@ const feedback =
 
 <div class="reveal" style="position: relative; padding: clamp(3rem,6vw,5rem) clamp(20px,5vw,64px); border-top: 0.5px solid var(--color-hairline); background: var(--color-bg-panel); overflow: hidden;">
   {illustrationLeft && (
-    <img src={illustrationLeft} alt="" style="position: absolute; top: 50%; left: -206px; transform: translateY(-50%); width: 600px; height: 600px; object-fit: contain; opacity: 0.28; pointer-events: none; z-index: 0;" />
+    <img src={illustrationLeft} alt="" style="position: absolute; top: 50%; left: -206px; transform: translateY(-50%); width: 600px; height: 600px; object-fit: contain; opacity: 0.16; pointer-events: none; z-index: 0;" />
   )}
   {illustrationRight && (
-    <img src={illustrationRight} alt="" style="position: absolute; top: 50%; right: -179px; transform: translateY(-50%); width: 525px; height: 525px; object-fit: contain; opacity: 0.28; pointer-events: none; z-index: 0;" />
+    <img src={illustrationRight} alt="" style="position: absolute; top: 50%; right: -179px; transform: translateY(-50%); width: 525px; height: 525px; object-fit: contain; opacity: 0.16; pointer-events: none; z-index: 0;" />
   )}
   <div style="position: relative; z-index: 1; text-align: center; margin-bottom: 2.25rem;">
     <p style="margin: 0 0 6px; font-size: 10px; letter-spacing: 2px; color: var(--color-gold); text-transform: uppercase;">{t('book.label')}</p>
     <p class="display-serif" style="margin: 0; font-size: 40px; color: var(--color-ink);">{t('book.heading')}</p>
-    <p style="margin: 16px auto 0; font-size: 15px; font-weight: 300; color: var(--color-body); line-height: 1.8; max-width: 480px;">{intro}</p>
+    <p style="margin: 16px auto 0; font-size: 15px; font-weight: 300; color: var(--color-text); line-height: 1.8; max-width: 480px;">{intro}</p>
   </div>
 
   <form method="POST" action="/api/contact" enctype="multipart/form-data" class="booking-form" style="position: relative; z-index: 1; display: grid; gap: 12px; max-width: 560px; margin: 0 auto;">

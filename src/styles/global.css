@@ -181,11 +181,11 @@
     display: block;
   }
   .hero-headline {
-    font-size: clamp(56px, 13vw, 72px) !important;
+    font-size: clamp(38px, 10.5vw, 54px) !important;
     line-height: 1.25 !important;
   }
-  .hero-break-space {
-    display: none !important;
+  .about-heading {
+    font-size: clamp(24px, 7.5vw, 32px) !important;
   }
   .hero-subheadline {
     white-space: normal !important;

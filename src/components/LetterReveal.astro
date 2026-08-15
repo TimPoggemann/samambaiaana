@@ -14,6 +14,19 @@
  * word boundaries — producing mid-word breaks ("beyondt" / "he skin")
  * whenever the heading doesn't fit on one line.
  *
+ * Every run of words between forced breaks (or the whole heading, if no
+ * breakAfterWordIndex is given) is further wrapped in its own
+ * `white-space: nowrap` segment, so the *only* place a line can ever break
+ * is the explicit <br> at breakAfterWordIndex. An earlier version tried to
+ * get the same effect by rendering every inter-word space as its own
+ * isolated non-breaking-space span — relying on browsers to still honor
+ * "non-breaking" for a single character once it's split out into its own
+ * inline-block box — which some mobile browsers don't: they broke the line
+ * between adjacent word boxes anyway, wrapping "Magic beyond" into "Magic" /
+ * "beyond" instead of keeping it as one line. `white-space: nowrap` on the
+ * segment is a real CSS wrapping rule, not a per-character workaround, so it
+ * holds regardless of browser quirks.
+ *
  * Must be placed inside an element carrying the `reveal` class.
  */
 interface Props {
@@ -28,6 +41,9 @@ interface Props {
 
 const { text, breakAfterWordIndex, wordColor, staggerMs = 25 } = Astro.props;
 
+// A plain space as the sole content of an inline-block span gets collapsed
+// to zero width by normal whitespace rules; a non-breaking space is exempt
+// and keeps the gap visible.
 const NBSP = String.fromCharCode(160);
 
 const words = text.split(' ');
@@ -39,27 +55,34 @@ const wordGroups = words.map((word, wi) => {
   return {
     letters,
     hasSpaceAfter: wi < words.length - 1,
-    spaceIsBreak: wi === breakAfterWordIndex,
+    isBreakPoint: wi === breakAfterWordIndex,
     spaceDelay,
   };
 });
+
+// Group the words into line segments, splitting at the forced break.
+const segments: (typeof wordGroups)[] = [[]];
+for (const group of wordGroups) {
+  segments[segments.length - 1].push(group);
+  if (group.isBreakPoint) segments.push([]);
+}
 ---
-{wordGroups.map((group) => (
+{segments.map((segment, si) => (
   <>
-    <span class="word" style="display: inline-block;">
-      {group.letters.map((l) => (
-        <span class="letter" style={{ '--d': l.delay, color: l.color ?? undefined }}>{l.char}</span>
+    <span class="line-segment" style="white-space: nowrap;">
+      {segment.map((group) => (
+        <>
+          <span class="word" style="display: inline-block;">
+            {group.letters.map((l) => (
+              <span class="letter" style={{ '--d': l.delay, color: l.color ?? undefined }}>{l.char}</span>
+            ))}
+          </span>
+          {group.hasSpaceAfter && !group.isBreakPoint && (
+            <span class="letter" style={{ '--d': group.spaceDelay }}>{NBSP}</span>
+          )}
+        </>
       ))}
     </span>
-    {group.hasSpaceAfter && (
-      <>
-        {group.spaceIsBreak && <br class="hero-mobile-break" />}
-        <span
-          class="letter"
-          class:list={[group.spaceIsBreak && 'hero-break-space']}
-          style={{ '--d': group.spaceDelay }}
-        >{NBSP}</span>
-      </>
-    )}
+    {si < segments.length - 1 && <br class="hero-mobile-break" />}
   </>
 ))}
