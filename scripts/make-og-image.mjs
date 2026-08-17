@@ -10,12 +10,10 @@
  *     in BaseLayout.astro pointing at a 404.
  *   - Some link scrapers still do not read webp. JPEG is the safe format here.
  *
- * TODO: SOURCE below assumes a hero.webp exists — update once the real hero
- * image is in place, and adjust the crop for that image's composition.
  */
 import sharp from 'sharp';
 
-const SOURCE = 'public/images/hero.webp';
+const SOURCE = 'public/images/hero-illustration.webp';
 const TARGET = 'public/og-image.jpg';
 
 // Facebook/LinkedIn/X all render 1200x630 (1.91:1) without recropping.

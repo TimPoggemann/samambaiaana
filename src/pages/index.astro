@@ -273,12 +273,12 @@ const schema = graph(origin, lang, [
 
     <div id="flash-track" style="display: flex; gap: 18px; overflow-x: auto; scroll-snap-type: x proximity; padding: 4px 4px 18px; scrollbar-width: none;">
       {flashItems.map((item) => (
-        <div style="position: relative; flex: 0 0 220px; scroll-snap-align: start; background: #FFFEFA; border: 0.5px solid var(--color-hairline-strong); border-radius: 8px; padding: 12px; box-shadow: 0 4px 16px rgba(74,59,36,0.06);">
+        <a href="/flash" style="position: relative; flex: 0 0 220px; scroll-snap-align: start; background: #FFFEFA; border: 0.5px solid var(--color-hairline-strong); border-radius: 8px; padding: 12px; box-shadow: 0 4px 16px rgba(74,59,36,0.06); display: block;">
           <div style="position: relative;">
             <img src={item.data.image} alt={localized(lang, item.data.title, item.data.titleEn)} style="width: 100%; aspect-ratio: 1; object-fit: cover; border-radius: 3px; display: block;" loading="lazy" />
             <FlashStatusBadge lang={lang} status={item.data.status} />
           </div>
-        </div>
+        </a>
       ))}
     </div>
     <div id="flash-dots" style="display: flex; justify-content: center; gap: 8px; margin-top: 4px;">

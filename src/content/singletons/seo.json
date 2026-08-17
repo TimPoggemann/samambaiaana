@@ -1,4 +1,16 @@
 {
-  "homepage": {},
-  "flash": {}
+  "homepage": {
+    "title": "Samambaia Ana — Tatuagem Fine-Line & Ornamental",
+    "titleEn": "Samambaia Ana — Fine-Line & Ornamental Tattoo",
+    "description": "Tatuagens ornamentais de traço fino e freehand por Ana Beatriz — botânicas, figurativas, místicas. Estúdio em São Paulo, Eurotour 2026.",
+    "descriptionEn": "Fine-line and freehand ornamental tattoos by Ana Beatriz — botanical, figurative, mystical. São Paulo studio, 2026 Eurotour.",
+    "noindex": false
+  },
+  "flash": {
+    "title": "Flash Designs — Samambaia Ana",
+    "titleEn": "Flash Designs — Samambaia Ana",
+    "description": "Todos os flashes disponíveis da Samambaia Ana — prontos para tatuar como estão, ou como ponto de partida para sua ideia.",
+    "descriptionEn": "Every available flash design from Samambaia Ana — ready to tattoo as is, or as a starting point for your own idea.",
+    "noindex": false
+  }
 }
