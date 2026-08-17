@@ -2,6 +2,11 @@
   "studioPhoto": "/images/studioPhoto.webp",
   "studioPhotoAlt": "Foto de Ana em seu estúdio",
   "studioPhotoAltEn": "Photo of Ana in her studio",
+  "homeStudioLabel": "Estúdio próprio",
+  "homeStudioLabelEn": "Home studio",
+  "tourName": "Eurotour",
+  "tourNameEn": "Eurotour",
+  "tourYear": "2026",
   "tourCities": [
     {
       "name": "Brussels",

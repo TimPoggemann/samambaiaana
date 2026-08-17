@@ -113,6 +113,15 @@ export default config({
         studioPhoto: fields.image({ label: 'Foto do Estúdio', directory: 'public/images', publicPath: '/images/' }),
         studioPhotoAlt: fields.text({ label: 'Alt Text da Foto', description: ALT_TEXT_HELP }),
         studioPhotoAltEn: enField('Alt Text da Foto'),
+        homeStudioLabel: fields.text({ label: 'Rótulo "Estúdio Próprio"', defaultValue: 'Estúdio próprio' }),
+        homeStudioLabelEn: enField('Rótulo "Estúdio Próprio"'),
+        tourName: fields.text({
+          label: 'Nome da Turnê',
+          description: 'ex: Eurotour, Turnê Austrália. Aparece na faixa abaixo do topo e na seção "Onde me encontrar".',
+          defaultValue: 'Eurotour',
+        }),
+        tourNameEn: enField('Nome da Turnê'),
+        tourYear: fields.text({ label: 'Ano da Turnê', defaultValue: '2026' }),
         tourCities: fields.array(
           fields.object({
             name: fields.text({ label: 'Cidade' }),

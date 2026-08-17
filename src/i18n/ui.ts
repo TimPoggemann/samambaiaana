@@ -38,8 +38,6 @@ export const ui = {
     'hero.intro': 'Tatuagens ornamentais de traço fino e freehand — botânicas, figurativas, místicas.',
     'hero.button': 'Agendar horário',
 
-    'booking.statusLabel': 'Eurotour · reservas abertas',
-
     'work.heading': 'Trabalhos selecionados',
     'work.seeMoreInsta': 'Ver mais no Instagram',
 
@@ -50,7 +48,6 @@ export const ui = {
     'where.heading': 'Onde me encontrar',
     'where.homeStudio': 'Estúdio próprio',
     'where.spByAppointment': 'São Paulo, Brasil · com hora marcada',
-    'where.eurotourHeading': 'Datas do Eurotour 2026',
 
     'book.label': 'Agendar horário',
     'book.heading': 'Vamos criar algo mágico juntas',
@@ -131,8 +128,6 @@ export const ui = {
     'hero.intro': 'Fine-line and freehand ornamental tattoos — botanical, figurative, mystical.',
     'hero.button': 'Book an appointment',
 
-    'booking.statusLabel': 'Eurotour · bookings open',
-
     'work.heading': 'Selected work',
     'work.seeMoreInsta': 'See more on Instagram',
 
@@ -143,7 +138,6 @@ export const ui = {
     'where.heading': 'Where to find me',
     'where.homeStudio': 'Home studio',
     'where.spByAppointment': 'São Paulo, Brazil · by appointment',
-    'where.eurotourHeading': 'Eurotour 2026 dates',
 
     'book.label': 'Book an appointment',
     'book.heading': "Let's create something magical together",
