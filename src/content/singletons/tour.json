@@ -11,11 +11,11 @@
     },
     {
       "name": "Cidades em breve",
-      "nameEn": "Cities coming soon",
-      "dates": "tbc"
+      "dates": "tbc",
+      "nameEn": "Cities coming soon"
     }
   ],
-  "hideTour": false,
+  "hideTour": true,
   "bookingsOpenText": "reservas abertas",
   "bookingsOpenTextEn": "bookings open",
   "datesText": "datas",
