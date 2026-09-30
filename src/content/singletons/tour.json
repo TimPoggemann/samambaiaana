@@ -15,7 +15,7 @@
       "nameEn": "Cities coming soon"
     }
   ],
-  "hideTour": true,
+  "hideTour": false,
   "bookingsOpenText": "reservas abertas",
   "bookingsOpenTextEn": "bookings open",
   "datesText": "datas",
