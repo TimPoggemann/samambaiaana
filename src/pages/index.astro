@@ -41,12 +41,31 @@ const portraitAlt = localized(lang, aboutData?.data.portraitAlt, aboutData?.data
 const whereData = await getEntry('singletons', 'where').catch(() => null);
 const studioPhoto = whereData?.data.studioPhoto ?? '/images/studio-photo.webp';
 const studioPhotoAlt = localized(lang, whereData?.data.studioPhotoAlt, whereData?.data.studioPhotoAltEn) ?? '';
-const tourCities: { name: string; dates: string }[] = whereData?.data.tourCities ?? [];
+const tourData = await getEntry('singletons', 'tour').catch(() => null);
+const hideTour = tourData?.data.hideTour === true;
+const tourCities: { name: string; dates: string }[] = hideTour
+  ? []
+  : (tourData?.data.tourCities ?? []).map((c: { name: string; nameEn?: string; dates: string; datesEn?: string }) => ({
+      name: localized(lang, c.name, c.nameEn) ?? c.name,
+      dates: localized(lang, c.dates, c.datesEn) ?? c.dates,
+    }));
 const homeStudioLabel = localized(lang, whereData?.data.homeStudioLabel, whereData?.data.homeStudioLabelEn) || t('where.homeStudio');
-const tourName = localized(lang, whereData?.data.tourName, whereData?.data.tourNameEn) || 'Eurotour';
-const tourYear = whereData?.data.tourYear || '2026';
-const bookingStatusLabel = lang === 'en' ? `${tourName} · bookings open ${tourYear}` : `${tourName} · reservas abertas ${tourYear}`;
-const tourHeading = lang === 'en' ? `${tourName} ${tourYear} dates` : `${tourName} ${tourYear} · datas`;
+const homeStudioText = localized(lang, whereData?.data.homeStudioText, whereData?.data.homeStudioTextEn) || t('where.spByAppointment');
+const tourName = localized(lang, tourData?.data.tourName, tourData?.data.tourNameEn) || 'Eurotour';
+const tourYear = localized(lang, tourData?.data.tourYear, tourData?.data.tourYearEn) || '2026';
+const bookingsOpenText = localized(lang, tourData?.data.bookingsOpenText, tourData?.data.bookingsOpenTextEn) || (lang === 'en' ? 'bookings open' : 'reservas abertas');
+const datesText = localized(lang, tourData?.data.datesText, tourData?.data.datesTextEn) || (lang === 'en' ? 'dates' : 'datas');
+const formHomeOption = localized(lang, tourData?.data.formHomeOption, tourData?.data.formHomeOptionEn) || t('book.optSaoPaulo');
+const bookingStatusLabel = `${tourName} · ${bookingsOpenText} ${tourYear}`;
+const tourHeading = `${tourName} ${tourYear} · ${datesText}`;
+// Shown in place of the tour when "Ocultar datas da turnê" is ticked in the CMS
+const noTourStripLabel = localized(lang, tourData?.data.noTourStripLabel, tourData?.data.noTourStripLabelEn) ?? '';
+const noTourStripDetail = localized(lang, tourData?.data.noTourStripDetail, tourData?.data.noTourStripDetailEn) ?? '';
+const noTourHeading = localized(lang, tourData?.data.noTourHeading, tourData?.data.noTourHeadingEn) ?? '';
+const noTourText = localized(lang, tourData?.data.noTourText, tourData?.data.noTourTextEn) ?? '';
+const noTourLink = localized(lang, tourData?.data.noTourLink, tourData?.data.noTourLinkEn) ?? '';
+const stripLabel = hideTour ? noTourStripLabel : bookingStatusLabel;
+const listHeading = hideTour ? noTourHeading : tourHeading;
 
 const bookingData = await getEntry('singletons', 'booking').catch(() => null);
 const bookingIntro = localized(lang, bookingData?.data.intro, bookingData?.data.introEn) ?? '';
@@ -87,7 +106,7 @@ const MOBILE_SPANS = [
 ];
 
 const CITY_OPTIONS = [
-  { label: t('book.optSaoPaulo'), value: t('book.optSaoPaulo') },
+  { label: formHomeOption, value: formHomeOption },
   ...tourCities.map((c) => ({ label: `${c.name} — ${c.dates}`, value: `${c.name} — ${c.dates}` })),
 ];
 
@@ -150,16 +169,27 @@ const schema = graph(origin, lang, [
   <!-- BOOKING STATUS STRIP -->
   <div class="booking-strip" style="display: flex; align-items: center; justify-content: center; gap: 14px; padding: 18px 26px; background: var(--color-bg-strip); border-top: 0.5px solid var(--color-hairline); border-bottom: 0.5px solid var(--color-hairline); flex-wrap: wrap; font-size: 13px;">
     <span style="display: inline-flex; align-items: center; gap: 8px; color: var(--color-text); letter-spacing: 2px; text-transform: uppercase;">
-      <span style="width: 6px; height: 6px; border-radius: 50%; background: var(--color-status-dot); display: inline-block;"></span>{bookingStatusLabel}
+      <span style="width: 6px; height: 6px; border-radius: 50%; background: var(--color-status-dot); display: inline-block;"></span>{stripLabel}
     </span>
-    <span class="booking-dot" style="color: var(--color-gold);">·</span>
-    <span style="color: #8A6A46; letter-spacing: 0.3px; text-align: center;">
-      {tourCities.map((c, i) => (
+    {hideTour ? (
+      noTourStripDetail && (
         <>
-          {c.name}{' '}<span style="color: var(--color-gold);">({c.dates})</span>{i < tourCities.length - 1 ? ' · ' : ''}
+          <span class="booking-dot" style="color: var(--color-gold);">·</span>
+          <span style="color: #8A6A46; letter-spacing: 0.3px; text-align: center;">{noTourStripDetail}</span>
         </>
-      ))}
-    </span>
+      )
+    ) : (
+      <>
+        <span class="booking-dot" style="color: var(--color-gold);">·</span>
+        <span style="color: #8A6A46; letter-spacing: 0.3px; text-align: center;">
+          {tourCities.map((c, i) => (
+            <>
+              {c.name}{' '}<span style="color: var(--color-gold);">({c.dates})</span>{i < tourCities.length - 1 ? ' · ' : ''}
+            </>
+          ))}
+        </span>
+      </>
+    )}
   </div>
 
   <!-- PORTFOLIO / WORK -->
@@ -244,13 +274,22 @@ const schema = graph(origin, lang, [
     <div class="where-grid" style="display: grid; gap: 110px; align-items: center; min-width: 0;">
       <div style="font-size: var(--fs-body); color: var(--color-body); line-height: 2.2; min-width: 0;">
         <p style="margin:0; color: var(--color-text); letter-spacing: 1.5px; text-transform: uppercase; font-size: 10px;">{homeStudioLabel}</p>
-        <p style="margin:0 0 18px; font-weight: 400;">{t('where.spByAppointment')}</p>
-        <p style="margin:0; color: var(--color-text); letter-spacing: 1.5px; text-transform: uppercase; font-size: 10px;">{tourHeading}</p>
-        <div style="display: flex; flex-direction: column; gap: 4px; margin-top: 6px; max-width: 280px;">
-          {tourCities.map((city) => (
-            <p style="margin: 0; font-weight: 400; display: flex; flex-wrap: wrap; justify-content: space-between; gap: 4px 12px;"><span>{city.name}</span><span style="color: var(--color-gold);">{city.dates}</span></p>
-          ))}
-        </div>
+        <p style="margin:0 0 18px; font-weight: 400;">{homeStudioText}</p>
+        <p style="margin:0; color: var(--color-text); letter-spacing: 1.5px; text-transform: uppercase; font-size: 10px;">{listHeading}</p>
+        {hideTour ? (
+          <>
+            <p style="margin: 6px 0 0; font-weight: 300; line-height: 1.9; max-width: 380px;">{noTourText}</p>
+            {noTourLink && (
+              <a href="#book" style="display: inline-block; margin-top: 34px; background: var(--color-ink); color: #FBF8F0; padding: 15px 38px; border-radius: 30px; font-size: 11px; letter-spacing: 2px; text-transform: uppercase; line-height: 1.4;">{noTourLink}</a>
+            )}
+          </>
+        ) : (
+          <div style="display: flex; flex-direction: column; gap: 4px; margin-top: 6px; max-width: 280px;">
+            {tourCities.map((city) => (
+              <p style="margin: 0; font-weight: 400; display: flex; flex-wrap: wrap; justify-content: space-between; gap: 4px 12px;"><span>{city.name}</span><span style="color: var(--color-gold);">{city.dates}</span></p>
+            ))}
+          </div>
+        )}
       </div>
       <img src={studioPhoto} alt={studioPhotoAlt} style="width: 100%; height: 360px; object-fit: cover; border-radius: 5px; min-width: 0;" />
     </div>

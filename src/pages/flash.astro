@@ -36,10 +36,16 @@ const STATUS_META: Record<FlashStatus, { color: string; label: string }> = {
   taken: { color: FLASH_STATUS_COLORS.taken, label: t(FLASH_STATUS_LABEL_KEY.taken) },
 };
 
-const whereData = await getEntry('singletons', 'where').catch(() => null);
-const tourCities: { name: string; dates: string }[] = whereData?.data.tourCities ?? [];
+const tourData = await getEntry('singletons', 'tour').catch(() => null);
+const tourCities: { name: string; dates: string }[] = tourData?.data.hideTour
+  ? []
+  : (tourData?.data.tourCities ?? []).map((c: { name: string; nameEn?: string; dates: string; datesEn?: string }) => ({
+      name: localized(lang, c.name, c.nameEn) ?? c.name,
+      dates: localized(lang, c.dates, c.datesEn) ?? c.dates,
+    }));
+const formHomeOption = localized(lang, tourData?.data.formHomeOption, tourData?.data.formHomeOptionEn) || t('book.optSaoPaulo');
 const CITY_OPTIONS = [
-  { label: t('book.optSaoPaulo'), value: t('book.optSaoPaulo') },
+  { label: formHomeOption, value: formHomeOption },
   ...tourCities.map((c) => ({ label: `${c.name} — ${c.dates}`, value: `${c.name} — ${c.dates}` })),
 ];
 

@@ -4,29 +4,6 @@
   "studioPhotoAltEn": "Photo of Ana in her studio",
   "homeStudioLabel": "Estúdio próprio",
   "homeStudioLabelEn": "Home studio",
-  "tourName": "Eurotour",
-  "tourNameEn": "Eurotour",
-  "tourYear": "2026",
-  "tourCities": [
-    {
-      "name": "Brussels",
-      "dates": "Jul 25–30"
-    },
-    {
-      "name": "Amsterdam",
-      "dates": "Aug 1–5"
-    },
-    {
-      "name": "London",
-      "dates": "Aug 5–10"
-    },
-    {
-      "name": "Lisbon",
-      "dates": "Aug 11–20"
-    },
-    {
-      "name": "New dates soon",
-      "dates": "tbc"
-    }
-  ]
+  "homeStudioText": "São Paulo, Brasil · com hora marcada",
+  "homeStudioTextEn": "São Paulo, Brazil · by appointment"
 }

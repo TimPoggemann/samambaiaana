@@ -1,0 +1,35 @@
+{
+  "tourName": "São Paulo & Eurotour",
+  "tourNameEn": "São Paulo & Eurotour",
+  "tourYear": "Out – Dez 2026",
+  "tourYearEn": "Oct – Dec 2026",
+  "tourCities": [
+    {
+      "name": "São Paulo",
+      "dates": "Out 7–20",
+      "datesEn": "Oct 7–20"
+    },
+    {
+      "name": "Cidades em breve",
+      "nameEn": "Cities coming soon",
+      "dates": "tbc"
+    }
+  ],
+  "hideTour": false,
+  "bookingsOpenText": "reservas abertas",
+  "bookingsOpenTextEn": "bookings open",
+  "datesText": "datas",
+  "datesTextEn": "dates",
+  "formHomeOption": "Cidade e datas — São Paulo (ano todo)",
+  "formHomeOptionEn": "City & dates — São Paulo (year-round)",
+  "noTourStripLabel": "Agenda aberta · Estúdio em São Paulo",
+  "noTourStripLabelEn": "Bookings open · Studio in São Paulo",
+  "noTourStripDetail": "Sessões com hora marcada",
+  "noTourStripDetailEn": "Sessions by appointment",
+  "noTourHeading": "Em viagem",
+  "noTourHeadingEn": "On the road",
+  "noTourText": "Por onde ando? Entre florestas tropicais, lagos que guardam segredos e cidades que tocam o céu — seguindo o rastro das fadas. Me mande uma mensagem e eu conto onde estou, para marcarmos a sua sessão.",
+  "noTourTextEn": "Where am I? Somewhere between tropical forests, lakes that keep secrets and cities that touch the sky — following the fairies' trail. Send me a message and I'll tell you where I am, so we can plan your session.",
+  "noTourLink": "Agendar horário",
+  "noTourLinkEn": "Book an appointment"
+}

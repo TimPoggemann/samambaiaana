@@ -63,7 +63,110 @@ export default config({
   storage: { kind: 'cloud' },
   cloud: { project: 'samambaiaana/samambaiaana' },
 
+  // Tour dates are the thing the client edits most (usually from a phone), so they get their own group pinned at the top.
+  ui: {
+    navigation: {
+      'Turnê': ['tour'],
+      'Página inicial': ['hero', '---', 'portfolio', 'about', 'where', 'booking', 'flash', 'testimonials', 'faq', 'otherWork'],
+      'Geral': ['footer', 'seo', 'privacy', 'terms'],
+    },
+  },
+
   singletons: {
+    tour: singleton({
+      label: '✈ Datas da Turnê',
+      path: 'src/content/singletons/tour',
+      format: { data: 'json' },
+      schema: {
+        tourName: fields.text({
+          label: 'Nome da Turnê',
+          description: 'ex: Eurotour, Turnê Austrália. Aparece na faixa abaixo do topo e na seção "Onde me encontrar".',
+          defaultValue: 'Eurotour',
+        }),
+        tourNameEn: enField('Nome da Turnê'),
+        tourYear: fields.text({
+          label: 'Período da Turnê',
+          description: 'ex: 2026, Nov – Dez 2026. Aparece depois de "reservas abertas" na faixa.',
+          defaultValue: '2026',
+        }),
+        tourYearEn: enField('Período da Turnê'),
+        tourCities: fields.array(
+          fields.object({
+            name: fields.text({ label: 'Cidade' }),
+            dates: fields.text({ label: 'Datas', description: 'ex: Out 7–20' }),
+            datesEn: fields.text({
+              label: 'Datas (EN)',
+              description: 'Só se o mês muda em inglês, ex: "Out 7–20" → "Oct 7–20". Deixe em branco para usar as datas acima.',
+            }),
+            nameEn: fields.text({
+              label: 'Cidade (EN)',
+              description: 'Só se o nome muda em inglês, ex: "Em breve" → "Coming soon". Deixe em branco para usar o nome acima.',
+            }),
+          }),
+          {
+            label: 'Cidades e datas',
+            description: 'Toque numa cidade para mudar as datas. Use + para adicionar, ou arraste para mudar a ordem.',
+            itemLabel: (props) =>
+              [props.fields.name.value, props.fields.dates.value].filter(Boolean).join(' — ') || 'Nova cidade',
+          }
+        ),
+        hideTour: fields.checkbox({
+          label: 'Ocultar datas da turnê',
+          description:
+            'Esconde a turnê da faixa abaixo do topo, da seção "Onde me encontrar" e do formulário. As datas continuam salvas para a próxima turnê. Enquanto marcado, os textos "Sem turnê" abaixo aparecem no lugar.',
+          defaultValue: false,
+        }),
+        bookingsOpenText: fields.text({
+          label: 'Faixa: texto entre o nome e o período',
+          description: 'Na faixa abaixo do topo: "[Nome da Turnê] · [este texto] [Período]".',
+          defaultValue: 'reservas abertas',
+        }),
+        bookingsOpenTextEn: enField('Faixa: texto entre o nome e o período'),
+        datesText: fields.text({
+          label: 'Onde me encontrar: texto depois do período',
+          description: 'Em "Onde me encontrar": "[Nome da Turnê] [Período] · [este texto]".',
+          defaultValue: 'datas',
+        }),
+        datesTextEn: enField('Onde me encontrar: texto depois do período'),
+        formHomeOption: fields.text({
+          label: 'Formulário: primeira opção de cidade',
+          description: 'Primeira opção fixa na lista de cidades do formulário, antes das cidades da turnê.',
+          defaultValue: 'Cidade e datas — São Paulo (ano todo)',
+        }),
+        formHomeOptionEn: enField('Formulário: primeira opção de cidade'),
+        noTourStripLabel: fields.text({
+          label: 'Sem turnê — Faixa: rótulo',
+          description: 'Texto em maiúsculas ao lado do ponto verde, ex: "Agenda aberta · Estúdio em São Paulo".',
+          defaultValue: 'Agenda aberta · Estúdio em São Paulo',
+        }),
+        noTourStripLabelEn: enField('Sem turnê — Faixa: rótulo'),
+        noTourStripDetail: fields.text({
+          label: 'Sem turnê — Faixa: detalhe',
+          description: 'Texto menor à direita, ex: "Sessões com hora marcada".',
+          defaultValue: 'Sessões com hora marcada',
+        }),
+        noTourStripDetailEn: enField('Sem turnê — Faixa: detalhe'),
+        noTourHeading: fields.text({
+          label: 'Sem turnê — Rótulo do texto',
+          description: 'Rótulo pequeno em maiúsculas em "Onde me encontrar", no lugar do título da turnê.',
+          defaultValue: 'Em viagem',
+        }),
+        noTourHeadingEn: enField('Sem turnê — Rótulo do texto'),
+        noTourText: fields.text({
+          label: 'Sem turnê — Texto',
+          description: 'Aparece em "Onde me encontrar" no lugar das cidades e datas.',
+          multiline: true,
+        }),
+        noTourTextEn: enField('Sem turnê — Texto', true),
+        noTourLink: fields.text({
+          label: 'Sem turnê — Texto do botão',
+          description: 'Botão abaixo do texto, leva ao formulário de agendamento.',
+          defaultValue: 'Agendar horário',
+        }),
+        noTourLinkEn: enField('Sem turnê — Texto do botão'),
+      },
+    }),
+
     hero: singleton({
       label: 'Hero',
       path: 'src/content/singletons/hero',
@@ -115,20 +218,12 @@ export default config({
         studioPhotoAltEn: enField('Alt Text da Foto'),
         homeStudioLabel: fields.text({ label: 'Rótulo "Estúdio Próprio"', defaultValue: 'Estúdio próprio' }),
         homeStudioLabelEn: enField('Rótulo "Estúdio Próprio"'),
-        tourName: fields.text({
-          label: 'Nome da Turnê',
-          description: 'ex: Eurotour, Turnê Austrália. Aparece na faixa abaixo do topo e na seção "Onde me encontrar".',
-          defaultValue: 'Eurotour',
+        homeStudioText: fields.text({
+          label: 'Texto do Estúdio Próprio',
+          description: 'Linha abaixo de "Estúdio próprio", ex: "São Paulo, Brasil · com hora marcada".',
+          defaultValue: 'São Paulo, Brasil · com hora marcada',
         }),
-        tourNameEn: enField('Nome da Turnê'),
-        tourYear: fields.text({ label: 'Ano da Turnê', defaultValue: '2026' }),
-        tourCities: fields.array(
-          fields.object({
-            name: fields.text({ label: 'Cidade' }),
-            dates: fields.text({ label: 'Datas', description: 'ex: Jul 21–25' }),
-          }),
-          { label: 'Datas do Eurotour', itemLabel: (props) => props.fields.name.value || 'Cidade' }
-        ),
+        homeStudioTextEn: enField('Texto do Estúdio Próprio'),
       },
     }),
 
