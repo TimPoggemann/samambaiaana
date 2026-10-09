@@ -235,7 +235,6 @@ export default config({
         introEn: enField('Texto Introdutório', true),
         flashIntro: fields.text({ label: 'Texto Introdutório (formulário na página de Flash)', multiline: true }),
         flashIntroEn: enField('Texto Introdutório (Flash)', true),
-        illustration: fields.image({ label: 'Ilustração Decorativa', directory: 'public/images', publicPath: '/images/' }),
       },
     }),
 

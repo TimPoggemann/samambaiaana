@@ -58,7 +58,6 @@ const listHeading = hideTour ? noTourHeading : tourHeading;
 
 const bookingData = await getEntry('singletons', 'booking').catch(() => null);
 const bookingIntro = localized(lang, bookingData?.data.intro, bookingData?.data.introEn) ?? '';
-const bookingIllustration = bookingData?.data.illustration ?? '/images/booking-illustration.webp';
 
 const portfolio = (await getCollection('portfolio')).sort((a, b) => a.data.order - b.data.order);
 const portfolioMain = portfolio.slice(0, 7); // slots 0-6, the fixed mosaic
@@ -278,7 +277,7 @@ const schema = graph(origin, lang, [
 
   <!-- BOOKING FORM -->
   <div id="book">
-    <BookingForm lang={lang} cityOptions={CITY_OPTIONS} intro={bookingIntro} contactEmail={contactEmail} illustrationLeft={bookingIllustration} illustrationRight="/images/winged-illustration.webp" />
+    <BookingForm lang={lang} cityOptions={CITY_OPTIONS} intro={bookingIntro} contactEmail={contactEmail} illustrationLeft="/images/booking-illustration.webp" illustrationRight="/images/winged-illustration.webp" />
   </div>
 
   <!-- FLASH -->
