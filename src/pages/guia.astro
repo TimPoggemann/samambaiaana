@@ -1,0 +1,398 @@
+---
+// Client-facing how-to for the Keystatic editor, linked from the "Como usar o painel" page in the CMS
+// (GUIDE_URL in keystatic.config.ts). Standalone on purpose: no site nav or splash, and kept out of search
+// (middleware NO_INDEX) and the sitemap. Screenshots and the PDF copy live in public/guia/.
+---
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="robots" content="noindex, nofollow" />
+  <title>Guia do Keystatic · Samambaia Ana</title>
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png" />
+  <style is:global>
+@font-face { font-family: 'Cormorant Garamond'; font-style: italic; font-weight: 400; font-display: swap; src: url('/fonts/cormorant-garamond-italic-400.woff2') format('woff2'); }
+@font-face { font-family: 'Zen Kaku Gothic New'; font-style: normal; font-weight: 400; font-display: swap; src: url('/fonts/zen-kaku-gothic-new-400.woff2') format('woff2'); }
+
+/* Layout: one reading column in the site's own paper-and-ink palette; screenshots framed like prints on the page. */
+:root {
+  --bg: #FBF8F0;
+  --panel: #F4EEE1;
+  --ink: #2E3327;
+  --text: #4A3B24;
+  --body: #6E6250;
+  --label: #9A7A54;
+  --gold: #A9814F;
+  --line: #E6DDCA;
+  --note-bg: #EEF1E6;
+  --note-line: #6E8B5A;
+  --warn-bg: #F7E9E1;
+  --warn-line: #B3413A;
+  --shadow: rgba(46, 51, 39, 0.10);
+  --display: 'Cormorant Garamond', 'Iowan Old Style', Georgia, serif;
+  --sans: 'Zen Kaku Gothic New', 'Hiragino Sans', system-ui, -apple-system, 'Segoe UI', sans-serif;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #1F231B; --panel: #2A2F24; --ink: #F3ECDD; --text: #E8E0CF; --body: #C9C0AC;
+    --label: #C9A877; --gold: #D2AE72; --line: #3B4133; --note-bg: #26301F; --note-line: #8FB074;
+    --warn-bg: #3A2522; --warn-line: #E07A6F; --shadow: rgba(0, 0, 0, 0.4); color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #1F231B; --panel: #2A2F24; --ink: #F3ECDD; --text: #E8E0CF; --body: #C9C0AC;
+  --label: #C9A877; --gold: #D2AE72; --line: #3B4133; --note-bg: #26301F; --note-line: #8FB074;
+  --warn-bg: #3A2522; --warn-line: #E07A6F; --shadow: rgba(0, 0, 0, 0.4); color-scheme: dark;
+}
+
+* { box-sizing: border-box; }
+body {
+  background: var(--bg); color: var(--body);
+  font-family: var(--sans); font-size: 16px; line-height: 1.75;
+  padding-inline: 16px; padding-block: 0 64px;
+}
+.wrap { max-width: 760px; margin: 0 auto; }
+
+header { padding-block: 56px 28px; border-bottom: 1px solid var(--line); }
+.eyebrow { font-size: 11px; letter-spacing: 3px; text-transform: uppercase; color: var(--label); margin: 0 0 14px; }
+h1 {
+  font-family: var(--display); font-style: italic; font-weight: 400; color: var(--ink);
+  font-size: clamp(40px, 8vw, 60px); line-height: 1.05; margin: 0 0 18px; text-wrap: balance;
+}
+.lede { font-size: 17px; color: var(--text); margin: 0; max-width: 60ch; }
+.address {
+  display: inline-flex; flex-wrap: wrap; align-items: center; gap: 10px;
+  margin-top: 22px; padding: 10px 14px; background: var(--panel); border-radius: 10px;
+  font-size: 14px; color: var(--text);
+}
+.address code { font-family: ui-monospace, 'SF Mono', Menlo, monospace; font-size: 15px; color: var(--ink); user-select: all; }
+.address a { color: var(--gold); }
+
+nav.toc { padding-block: 22px; border-bottom: 1px solid var(--line); }
+nav.toc p { margin: 0 0 10px; font-size: 11px; letter-spacing: 2.5px; text-transform: uppercase; color: var(--label); }
+nav.toc ol { margin: 0; padding: 0; list-style: none; display: flex; flex-wrap: wrap; gap: 8px; }
+nav.toc a {
+  display: inline-block; padding: 6px 13px; border: 1px solid var(--line); border-radius: 999px;
+  font-size: 14px; color: var(--text); text-decoration: none;
+}
+nav.toc a:hover, nav.toc a:focus-visible { border-color: var(--gold); color: var(--ink); outline: none; }
+
+section { padding-block: 44px 8px; }
+h2 {
+  font-family: var(--display); font-style: italic; font-weight: 400; color: var(--ink);
+  font-size: clamp(30px, 5.5vw, 38px); line-height: 1.15; margin: 0 0 6px; text-wrap: balance;
+}
+.where { font-size: 13px; color: var(--label); margin: 0 0 18px; letter-spacing: 0.3px; }
+h3 { font-size: 16px; font-weight: 700; color: var(--ink); margin: 30px 0 8px; }
+p { margin: 0 0 14px; max-width: 65ch; }
+strong { color: var(--text); font-weight: 700; }
+.ui {
+  font-weight: 400; color: var(--ink); background: var(--panel);
+  padding: 1px 7px; border-radius: 5px; white-space: nowrap; font-size: 0.94em;
+}
+.btn-blue { background: #4566D8; color: #fff; padding: 1px 9px; border-radius: 999px; font-size: 0.9em; font-weight: 400; white-space: nowrap; }
+
+ol.steps { margin: 0 0 18px; padding: 0; list-style: none; counter-reset: s; display: grid; gap: 10px; }
+ol.steps li { counter-increment: s; display: grid; grid-template-columns: 30px 1fr; gap: 10px; align-items: start; }
+ol.steps li > span { min-width: 0; }
+ol.steps li::before {
+  content: counter(s); width: 26px; height: 26px; border-radius: 50%; margin-top: 2px;
+  border: 1px solid var(--gold); color: var(--gold); font-size: 13px; font-weight: 400;
+  display: grid; place-items: center;
+}
+ul.plain { margin: 0 0 16px; padding-left: 20px; }
+ul.plain li { margin-bottom: 6px; }
+ul.plain li::marker { color: var(--gold); }
+
+figure { margin: 22px 0 26px; }
+figure img {
+  display: block; width: 100%; height: auto; border-radius: 10px;
+  border: 1px solid var(--line); box-shadow: 0 10px 30px -14px var(--shadow);
+}
+figcaption { font-size: 13px; color: var(--label); margin-top: 10px; line-height: 1.55; }
+
+.side { display: grid; grid-template-columns: 1fr 230px; gap: 28px; align-items: start; }
+.side > div { min-width: 0; }
+.side figure { margin: 4px 0 0; }
+@media (max-width: 640px) {
+  .side { grid-template-columns: 1fr; }
+  .side figure { max-width: 260px; }
+}
+
+.note, .warn { border-radius: 10px; padding: 14px 16px; margin: 18px 0; font-size: 15px; border-left: 3px solid; }
+.note { background: var(--note-bg); border-color: var(--note-line); }
+.warn { background: var(--warn-bg); border-color: var(--warn-line); }
+.note p, .warn p { margin: 0; }
+.note p + p, .warn p + p { margin-top: 8px; }
+
+table { width: 100%; border-collapse: collapse; font-size: 15px; }
+.tbl { overflow-x: auto; margin: 10px 0 20px; }
+th, td { text-align: left; padding: 10px 12px 10px 0; border-bottom: 1px solid var(--line); vertical-align: top; }
+th { font-size: 11px; letter-spacing: 2px; text-transform: uppercase; color: var(--label); font-weight: 400; }
+td:first-child { color: var(--ink); font-weight: 400; white-space: nowrap; }
+
+.timing { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px; margin: 18px 0; }
+.timing div { background: var(--panel); border-radius: 10px; padding: 14px 16px; }
+.timing b { display: block; font-family: var(--display); font-style: italic; font-weight: 400; font-size: 28px; color: var(--ink); line-height: 1.1; }
+.timing span { font-size: 14px; }
+
+footer { margin-top: 48px; padding-top: 22px; border-top: 1px solid var(--line); font-size: 14px; color: var(--label); }
+
+a { color: var(--gold); }
+:focus-visible { outline: 2px solid var(--gold); outline-offset: 2px; }
+
+.pdf-line { margin: 14px 0 0; font-size: 14px; }
+
+@page { size: A4; margin: 16mm 15mm; }
+@media print {
+  body { padding-inline: 0; padding-block: 0; font-size: 11pt; line-height: 1.6; }
+  .pdf-link { display: none; }
+  h2, h3 { break-after: avoid; }
+  figure, .note, .warn, .timing, ol.steps li, tr { break-inside: avoid; }
+}
+.pdf-link { display: inline-flex; margin-left: 10px; }
+  </style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <p class="eyebrow">Samambaia Ana · como editar o site</p>
+    <h1>Guia do Keystatic</h1>
+    <p class="lede">O Keystatic é o painel onde você muda os textos, as fotos, os flashes e as datas da turnê do site, sem precisar de programador. Funciona no computador e no celular.</p>
+    <div class="address">Endereço: <code>samambaiaana.com/keystatic</code> <a href="/keystatic" target="_blank" rel="noopener">abrir</a></div>
+    <p class="pdf-line"><a href="/guia/guia-keystatic-samambaia-ana.pdf" download>Baixar este guia em PDF</a> para guardar ou imprimir.</p>
+  </header>
+
+  <nav class="toc" aria-label="Conteúdo">
+    <p>Neste guia</p>
+    <ol>
+      <li><a href="#entrar">Entrar</a></li>
+      <li><a href="#painel">O painel</a></li>
+      <li><a href="#salvar">Salvar e publicar</a></li>
+      <li><a href="#turne">Datas da turnê</a></li>
+      <li><a href="#portfolio">Fotos do portfólio</a></li>
+      <li><a href="#flash">Flashes</a></li>
+      <li><a href="#textos">Textos</a></li>
+      <li><a href="#cuidados">O que não mexer</a></li>
+      <li><a href="#problemas">Se algo der errado</a></li>
+    </ol>
+  </nav>
+
+  <section id="entrar">
+    <h2>Entrar</h2>
+    <p class="where">samambaiaana.com/keystatic</p>
+    <ol class="steps">
+      <li><span>Abra <strong>samambaiaana.com/keystatic</strong> no navegador. Vale salvar nos favoritos ou na tela inicial do celular.</span></li>
+      <li><span>Clique em <span class="ui">Log in with Keystatic Cloud</span>.</span></li>
+      <li><span>Na página de login, entre com a sua conta: <strong>e-mail e senha</strong>, ou o botão <span class="ui">GitHub</span> se foi assim que você criou a conta. Se você ainda não tem conta, peça o convite ao Tim.</span></li>
+      <li><span>Pronto, o painel abre. Na próxima vez, o navegador normalmente já lembra de você.</span></li>
+    </ol>
+    <figure>
+      <img src="/guia/01-entrar.jpg" alt="Página inicial do Keystatic com o botão Log in with Keystatic Cloud" width="800" height="600" loading="lazy">
+      <figcaption>A primeira tela: só um botão.</figcaption>
+    </figure>
+    <figure>
+      <img src="/guia/02-login.jpg" alt="Tela de login do Keystatic Cloud com opções GitHub, Passkey e e-mail e senha" width="800" height="600" loading="lazy">
+      <figcaption>A tela de login. Use o mesmo jeito de entrar que você usou ao criar a conta.</figcaption>
+    </figure>
+  </section>
+
+  <section id="painel">
+    <h2>O painel</h2>
+    <p class="where">Menu à esquerda</p>
+    <p>Depois de entrar, você vê o menu à esquerda. Cada item corresponde a uma parte do site, e cada um abre com um quadro <strong>ℹ️ Como funciona</strong> explicando o que ele muda. O primeiro item, <strong>📖 Como usar o painel</strong>, resume as regras deste guia.</p>
+    <figure>
+      <img src="/guia/03-painel.jpg" alt="Painel do Keystatic com os grupos Turnê, Página inicial e Geral" width="800" height="500" loading="lazy">
+      <figcaption>O painel. Comece por “Como usar o painel”. No seu, aparece também um seletor <span class="ui">main</span> no alto do menu e o seu nome embaixo. Deixe o <span class="ui">main</span> como está.</figcaption>
+    </figure>
+    <figure>
+      <img src="/guia/11-guia.jpg" alt="Página Como usar o painel com os quadros Bem-vinda, Salvar e publicar, Campos em inglês, Fotos e O que não mexer" width="800" height="500" loading="lazy">
+      <figcaption>“Como usar o painel”: só leitura, um resumo das regras. Não precisa clicar em <span class="ui">Save</span> nessa página.</figcaption>
+    </figure>
+    <div class="tbl">
+      <table>
+        <thead><tr><th>No menu</th><th>No site</th></tr></thead>
+        <tbody>
+          <tr><td>📖 Como usar o painel</td><td>Só leitura: um resumo de como salvar, fotos, inglês e o que não mexer</td></tr>
+          <tr><td>✈ Datas da Turnê</td><td>A faixa abaixo do topo, a seção “Onde me encontrar” e a lista de cidades no formulário</td></tr>
+          <tr><td>Hero (topo do site)</td><td>O topo do site: título, subtítulo, botão e vídeo de fundo</td></tr>
+          <tr><td>Portfólio (fotos das tatuagens)</td><td>As 8 fotos do mosaico de trabalhos</td></tr>
+          <tr><td>Sobre</td><td>Sua bio e o retrato</td></tr>
+          <tr><td>Onde me encontrar</td><td>Foto do estúdio e o texto “Estúdio próprio”</td></tr>
+          <tr><td>Agendamento</td><td>Os textos acima do formulário (na página inicial e na página Flash)</td></tr>
+          <tr><td>Flash</td><td>Os desenhos de flash, com status disponível / reservado / indisponível</td></tr>
+          <tr><td>Depoimentos</td><td>As frases de clientes</td></tr>
+          <tr><td>Perguntas Frequentes</td><td>As perguntas e respostas</td></tr>
+          <tr><td>Outros Trabalhos (Loja)</td><td>Os links para cerâmica, prints e outros produtos</td></tr>
+          <tr><td>Rodapé</td><td>E-mail, Instagram, link da loja e a linha de localização</td></tr>
+          <tr><td>SEO / Meta</td><td>Como o site aparece no Google e ao compartilhar. Pode deixar como está.</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section id="salvar">
+    <h2>Salvar e publicar</h2>
+    <p class="where">Botão azul no canto superior direito</p>
+    <p>Você pode mudar o que quiser numa página: nada vai para o site até você clicar em <span class="btn-blue">Save</span>. Quando clicar, o site é atualizado sozinho em alguns minutos.</p>
+    <div class="timing">
+      <div><b>1–2 min</b><span>para textos, datas e status aparecerem no site</span></div>
+      <div><b>4–5 min</b><span>para fotos e vídeos novos: o site primeiro comprime o arquivo e depois publica</span></div>
+    </div>
+    <p>Se depois desse tempo você ainda vir a versão antiga, recarregue a página do site (no celular, puxe a página para baixo).</p>
+    <div class="note"><p><strong>Campos com (EN):</strong> são a versão em inglês do campo acima. Se deixar em branco, o site em inglês usa o texto em português. Então você só precisa preencher se quiser uma tradução.</p></div>
+  </section>
+
+  <section id="turne">
+    <h2>Datas da turnê</h2>
+    <p class="where">Turnê → ✈ Datas da Turnê</p>
+    <p>É a parte que você vai mudar mais, por isso fica no topo do menu.</p>
+    <figure>
+      <img src="/guia/04-turne.jpg" alt="Página Datas da Turnê com nome, período e a lista de cidades" width="800" height="500" loading="lazy">
+      <figcaption>No topo, o quadro “Como funciona” resume esta página. Logo abaixo: nome da turnê e período.</figcaption>
+    </figure>
+
+    <h3>Mudar as datas de uma cidade</h3>
+    <ol class="steps">
+      <li><span>Em <strong>Cidades e datas</strong>, toque na cidade. Abre uma janelinha.</span></li>
+      <li><span>Mude <strong>Datas</strong> (ex.: <em>Out 7–20</em>). Se o mês muda em inglês, escreva a versão em <strong>Datas (EN)</strong> (ex.: <em>Oct 7–20</em>).</span></li>
+      <li><span>Clique em <span class="ui">Done</span> e depois em <span class="btn-blue">Save</span>.</span></li>
+    </ol>
+    <figure>
+      <img src="/guia/05-cidade.jpg" alt="Janela Edit item com os campos Cidade, Datas, Datas (EN) e Cidade (EN)" width="800" height="500" loading="lazy">
+      <figcaption>A janela de uma cidade. <span class="ui">Done</span> fecha a janela; o <span class="ui">Save</span> no topo publica.</figcaption>
+    </figure>
+
+    <h3>Adicionar, tirar ou reordenar cidades</h3>
+    <ul class="plain">
+      <li><strong>Adicionar:</strong> botão <span class="ui">Add</span> acima da lista.</li>
+      <li><strong>Tirar:</strong> o ícone de lixeira à direita da cidade.</li>
+      <li><strong>Mudar a ordem:</strong> segure os seis pontinhos à esquerda e arraste.</li>
+    </ul>
+    <figure>
+      <img src="/guia/04b-cidades.jpg" alt="Lista de cidades com o botão Add, os pontinhos para arrastar, a lixeira e a opção Ocultar datas da turnê" width="800" height="500" loading="lazy">
+      <figcaption>A lista de cidades: <span class="ui">Add</span> em cima, pontinhos à esquerda para arrastar, lixeira à direita. Logo abaixo está a opção “Ocultar datas da turnê”.</figcaption>
+    </figure>
+
+    <h3>Sem turnê no momento</h3>
+    <p>Marque <strong>Ocultar datas da turnê</strong> e salve. A turnê some do site, mas as cidades ficam guardadas para a próxima vez. No lugar aparecem os textos “Sem turnê” que estão mais abaixo na mesma página, e você pode ajustá-los.</p>
+
+    <div class="side">
+      <div>
+        <h3 style="margin-top:6px">No celular</h3>
+        <p>Funciona igual, com o mesmo quadro “Como funciona” no topo. O menu fica escondido no ícone do canto superior esquerdo, e o <span class="btn-blue">Save</span> continua no topo à direita.</p>
+      </div>
+      <figure>
+        <img src="/guia/09-celular.jpg" alt="Página Datas da Turnê aberta no celular" width="375" height="812" loading="lazy">
+        <figcaption>Datas da Turnê no celular.</figcaption>
+      </figure>
+    </div>
+  </section>
+
+  <section id="portfolio">
+    <h2>Fotos do portfólio</h2>
+    <p class="where">Página inicial → Portfólio (fotos das tatuagens)</p>
+    <p>O mosaico de trabalhos tem <strong>8 posições fixas</strong>; o número de cada uma está em <strong>Posição no Grid (0–7)</strong>. Cada posição tem um tamanho e formato próprios no desenho do site, então aqui você <strong>troca a foto</strong> de uma posição; não adiciona nem apaga.</p>
+    <figure>
+      <img src="/guia/06-portfolio.jpg" alt="Lista do portfólio com as 8 fotos, cada uma com nome e posição no grid" width="800" height="500" loading="lazy">
+      <figcaption>As 8 fotos, em ordem alfabética. O nome (“O Rosto do Sol” etc.) é só um apelido para você se orientar e não aparece no site. A coluna da direita, <strong>Posição no Grid</strong>, diz onde cada foto fica no mosaico.</figcaption>
+    </figure>
+
+    <h3>Trocar uma foto</h3>
+    <ol class="steps">
+      <li><span>Abra a posição que quer mudar.</span></li>
+      <li><span>Em <strong>Foto</strong>, clique em <span class="ui">Choose file</span> e escolha a nova imagem. Pode ser direto do celular, em JPG ou PNG; o site comprime e converte sozinho.</span></li>
+      <li><span>Atualize o <strong>Alt Text</strong>: uma frase curta descrevendo a foto (ex.: <em>Tatuagem botânica de traço fino no antebraço</em>). Ajuda pessoas com deficiência visual e o Google.</span></li>
+      <li><span>Clique em <span class="btn-blue">Save</span>.</span></li>
+    </ol>
+    <figure>
+      <img src="/guia/07-slot.jpg" alt="Página de uma posição do portfólio com a foto atual e o botão Choose file" width="800" height="500" loading="lazy">
+      <figcaption>Uma foto do portfólio aberta: o quadro “Como funciona” no topo, depois o apelido, o nome do arquivo (automático, pode ignorar), a posição e a foto atual embaixo de <span class="ui">Choose file</span>.</figcaption>
+    </figure>
+    <div class="note">
+      <p><strong>Corte:</strong> o site corta as bordas da foto para encaixar no mosaico. Prefira fotos com a tatuagem bem no centro e um pouco de espaço em volta.</p>
+      <p><strong>Posição 7:</strong> é a foto grande do final, que cresce até ocupar a tela inteira quando a pessoa rola a página no computador. Use uma foto horizontal e de boa resolução.</p>
+    </div>
+    <div class="warn"><p>Não use o botão <span class="ui">Add</span> nem a lixeira no portfólio. Uma posição nova não aparece no site, e apagar uma deixa um buraco no mosaico.</p></div>
+  </section>
+
+  <section id="flash">
+    <h2>Flashes</h2>
+    <p class="where">Página inicial → Flash</p>
+    <p>Cada desenho é um item da lista, com o nome do desenho. A página inicial mostra os 8 primeiros e a página Flash mostra todos.</p>
+    <figure>
+      <img src="/guia/10-flash-lista.jpg" alt="Lista de flashes com nome, status e ordem de exibição" width="800" height="500" loading="lazy">
+      <figcaption>A lista de flashes, em ordem alfabética. A ordem no site é a da coluna <strong>Ordem de Exibição</strong>. A coluna Status aparece em inglês (<em>available</em>, <em>reserved</em>, <em>taken</em>); dentro de cada desenho ela está em português.</figcaption>
+    </figure>
+
+    <h3>Marcar como reservado ou vendido</h3>
+    <ol class="steps">
+      <li><span>Abra o desenho.</span></li>
+      <li><span>Em <strong>Status</strong>, escolha <strong>Disponível</strong>, <strong>Reservado</strong> ou <strong>Indisponível</strong>.</span></li>
+      <li><span>Clique em <span class="btn-blue">Save</span>. Desenhos <strong>Indisponível</strong> (já tatuados) vão sozinhos para o fim da lista no site.</span></li>
+    </ol>
+
+    <h3>Adicionar um flash novo</h3>
+    <ol class="steps">
+      <li><span>Na lista, clique em <span class="btn-blue">Add</span>.</span></li>
+      <li><span>Escreva o <strong>Nome do Desenho</strong>. O <strong>Nome do arquivo</strong> se preenche sozinho. Se quiser, escreva o nome em inglês logo abaixo.</span></li>
+      <li><span>Em <strong>Imagem</strong>, clique em <span class="ui">Choose file</span> e escolha o desenho.</span></li>
+      <li><span>Defina a <strong>Ordem de Exibição</strong>: número menor aparece primeiro.</span></li>
+      <li><span>Escolha o <strong>Status</strong> e clique em <span class="btn-blue">Save</span>.</span></li>
+    </ol>
+    <figure>
+      <img src="/guia/08-flash.jpg" alt="Página de um flash com nome, nome do arquivo, nome em inglês, ordem e imagem" width="800" height="500" loading="lazy">
+      <figcaption>Um flash aberto. O quadro “Como funciona” no topo resume tudo desta seção.</figcaption>
+    </figure>
+
+    <h3>Tirar um flash do site</h3>
+    <p>Abra o desenho e clique na <strong>lixeira</strong> na barra do topo, ao lado do <span class="btn-blue">Save</span>. Se só quiser mostrar que já foi tatuado, use o status <strong>Indisponível</strong> em vez de apagar.</p>
+  </section>
+
+  <section id="textos">
+    <h2>Textos</h2>
+    <p class="where">Hero (topo do site), Sobre, Onde me encontrar, Agendamento, Depoimentos, Perguntas Frequentes, Loja, Rodapé</p>
+    <p>Todos funcionam do mesmo jeito: abra, mude o texto no campo e clique em <span class="btn-blue">Save</span>. Cada seção começa com o quadro <strong>ℹ️ Como funciona</strong>, e muitos campos têm uma explicação curta em cinza logo abaixo do nome, dizendo onde aquele texto aparece no site.</p>
+    <figure>
+      <img src="/guia/12-hero.jpg" alt="Página Hero (topo do site) com o quadro Como funciona, título, subtítulo e texto do botão" width="800" height="500" loading="lazy">
+      <figcaption>“Hero” é a parte de cima do site, a primeira coisa que as pessoas veem: o título grande, o subtítulo, o botão de agendar e o vídeo de fundo.</figcaption>
+    </figure>
+    <ul class="plain">
+      <li><strong>Depoimentos, Perguntas Frequentes e Loja</strong> são listas como os flashes: <span class="btn-blue">Add</span> para criar, lixeira para apagar, e <strong>Ordem de Exibição</strong> para a sequência.</li>
+      <li><strong>Hero (topo do site) → Vídeo de Fundo:</strong> o vídeo atual aparece logo abaixo do campo; é só dar play. Para trocar, clique em <span class="ui">Choose file</span> e escolha um MP4 leve, de preferência abaixo de 10 MB (vídeo pesado deixa o site lento no celular). O site corta as bordas para preencher o topo da tela, então deixe o principal no centro do vídeo.</li>
+      <li><strong>Sobre e Onde me encontrar</strong> têm fotos que se trocam como no portfólio: <span class="ui">Choose file</span>, Alt Text e <span class="btn-blue">Save</span>.</li>
+    </ul>
+    <figure>
+      <img src="/guia/13-video.jpg" alt="Campo Vídeo de Fundo com os botões Choose file, Remove e Download e o vídeo atual com controles de play" width="800" height="500" loading="lazy">
+      <figcaption>O campo do vídeo no Hero: o vídeo que está no site aparece embaixo, com play.</figcaption>
+    </figure>
+  </section>
+
+  <section id="cuidados">
+    <h2>O que não mexer</h2>
+    <ul class="plain">
+      <li><strong>Nome do arquivo (automático)</strong> e o botão <span class="ui">Regenerate</span> ao lado: são preenchidos sozinhos a partir do nome. Pode ignorar.</li>
+      <li>O seletor <span class="ui">main</span> no alto do menu: deixe sempre em <strong>main</strong>. É a versão publicada do site.</li>
+      <li><strong>Add</strong> e lixeira no <strong>Portfólio (fotos das tatuagens)</strong> (veja acima).</li>
+      <li><strong>Política de Privacidade</strong> e <strong>Termos de Uso</strong>: textos legais, combine com o Tim antes de mudar.</li>
+    </ul>
+  </section>
+
+  <section id="problemas">
+    <h2>Se algo der errado</h2>
+    <ul class="plain">
+      <li><strong>A mudança não aparece no site:</strong> espere 2 minutos (5 se for foto ou vídeo) e recarregue a página. Às vezes o celular guarda a versão antiga; abrir numa aba anônima ajuda a conferir.</li>
+      <li><strong>Mudou algo sem querer e ainda não salvou:</strong> é só sair da página sem clicar em <span class="btn-blue">Save</span>. Nada foi publicado.</li>
+      <li><strong>Salvou algo errado:</strong> volte, corrija e salve de novo. Toda versão anterior fica guardada, então o Tim também consegue recuperar qualquer coisa.</li>
+      <li><strong>Não consegue entrar ou algo parece quebrado:</strong> mande um print para o Tim.</li>
+    </ul>
+  </section>
+
+  <footer>
+    As imagens deste guia são de uma cópia de teste do painel; no seu aparecem também o seletor “main” e o seu nome no menu.
+  </footer>
+</div>
+
+</body>
+</html>

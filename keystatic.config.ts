@@ -93,7 +93,7 @@ function linkNote(label: string, text: string, href: string, linkText: string) {
   return { ...base, Input };
 }
 
-const GUIDE_URL = 'https://claude.ai/artifact/AwMCuJw4GJ7ySEZkwhgVGx';
+const GUIDE_URL = '/guia'; // src/pages/guia.astro
 
 const SAVE_NOTE = 'Clique em "Save" no topo para publicar.';
 

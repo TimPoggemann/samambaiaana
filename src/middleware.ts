@@ -8,7 +8,7 @@ const ONE_YEAR = 60 * 60 * 24 * 365;
  * Never touch the CMS, the API routes or anything that looks like a file —
  * redirecting those would break Keystatic auth and the contact form POST.
  */
-const SKIP = [/^\/api\//, /^\/keystatic/, /^\/_/, /\.[a-z0-9]+$/i];
+const SKIP = [/^\/api\//, /^\/keystatic/, /^\/guia/, /^\/_/, /\.[a-z0-9]+$/i];
 
 /**
  * The CMS must stay out of the search index.
@@ -19,7 +19,7 @@ const SKIP = [/^\/api\//, /^\/keystatic/, /^\/_/, /\.[a-z0-9]+$/i];
  * `_headers` files only apply to static assets, not the SSR worker. See
  * suleika-portfolio's middleware.ts for the verification that led here.
  */
-const NO_INDEX = /^\/keystatic/;
+const NO_INDEX = /^\/(keystatic|guia)/; // /guia is the editor how-to for the client — Portuguese-only, no language redirect
 
 /**
  * Return the response with X-Robots-Tag attached.
