@@ -184,18 +184,7 @@ export default config({
         introEn: enField('Subtítulo', true),
         button: fields.text({ label: 'Texto do Botão', defaultValue: 'Agendar horário' }),
         buttonEn: enField('Texto do Botão'),
-        mediaType: fields.select({
-          label: 'Tipo de Mídia de Fundo',
-          options: [
-            { label: 'Vídeo', value: 'video' },
-            { label: 'Imagem', value: 'image' },
-          ],
-          defaultValue: 'video',
-        }),
-        video: fields.file({ label: 'Vídeo de Fundo (se Tipo = Vídeo)', directory: 'public/videos', publicPath: '/videos/' }),
-        image: fields.image({ label: 'Imagem de Fundo (se Tipo = Imagem)', directory: 'public/images', publicPath: '/images/' }),
-        imageAlt: fields.text({ label: 'Alt Text da Imagem', description: ALT_TEXT_HELP }),
-        imageAltEn: enField('Alt Text da Imagem'),
+        video: fields.file({ label: 'Vídeo de Fundo', directory: 'public/videos', publicPath: '/videos/' }),
       },
     }),
 

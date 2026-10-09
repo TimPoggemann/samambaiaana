@@ -5,9 +5,5 @@
   "introEn": "Fine-line and freehand ornamental tattoos — botanical, figurative, mystical.",
   "button": "Agendar horário",
   "buttonEn": "Book an appointment",
-  "mediaType": "video",
-  "video": "/videos/hero-video.mp4",
-  "image": "/images/hero-illustration.webp",
-  "imageAlt": "Ilustração de figura alada",
-  "imageAltEn": "Winged figure illustration"
+  "video": "/videos/hero-video.mp4"
 }

@@ -9,7 +9,7 @@ This file provides guidance to Codex (Codex.ai/code) when working with code in t
 - `npm run preview` — preview the production build locally
 - `npm run astro -- <args>` — Astro CLI passthrough (e.g. `npm run astro -- check`)
 - `npm run optimize:images` — manually re-run the image optimizer (CI normally does this; see Image pipeline below)
-- `npm run make:og` — regenerate the default `public/og-image.jpg` from the hero image (currently sourced from `public/images/hero-illustration.webp` — update `scripts/make-og-image.mjs`'s `SOURCE` if the hero moves to a video-only setup with no static frame)
+- `npm run make:og` — regenerate the default `public/og-image.jpg` from `public/images/hero-illustration.webp` (the hero itself is video-only and no longer CMS-switchable to an image; that file is kept only as this script's `SOURCE`)
 - `npm install` requires `legacy-peer-deps=true` (set in `.npmrc`) to resolve current Astro/React peer ranges — don't remove that setting without confirming install still succeeds.
 
 There is no test framework, no linter, and no CI check configured beyond the image-optimization workflow described below.

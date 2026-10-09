@@ -172,10 +172,6 @@
   }
 }
 
-@keyframes heroDrift1 {
-  0%, 100% { transform: translate(0, 0) scale(1); }
-  50% { transform: translate(-8px, -14px) scale(1.06); }
-}
 @keyframes sparkleTwinkle {
   0%, 100% { opacity: 0.3; }
   50% { opacity: 1; }
