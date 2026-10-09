@@ -51,9 +51,23 @@ function noIndex(response: Response): Response {
 const CRAWLER =
   /bot|crawl|spider|slurp|search|lighthouse|facebookexternalhit|whatsapp|telegram|quora link preview|skypeuripreview|embedly|pinterest|vkshare|redditbot|flipboard|nuzzel|outbrain|xing-contenttabreceiver/i;
 
+/**
+ * The project's built-in *.pages.dev address can't be switched off without
+ * deleting the project (which would take the custom domain down with it), so
+ * it permanently forwards to the real domain instead. Only the production
+ * alias — per-deployment preview URLs (<hash>.samambaiaana.pages.dev) stay
+ * reachable for checking a build before it goes live.
+ */
+const PAGES_DEV_HOST = 'samambaiaana.pages.dev';
+const CANONICAL_ORIGIN = 'https://samambaiaana.com';
+
 export const onRequest = defineMiddleware(async (context, next) => {
   const { url, cookies, request } = context;
   const { pathname, search } = url;
+
+  if (url.hostname === PAGES_DEV_HOST) {
+    return Response.redirect(`${CANONICAL_ORIGIN}${pathname}${search}`, 301);
+  }
 
   if (SKIP.some((re) => re.test(pathname))) {
     return NO_INDEX.test(pathname) ? noIndex(await next()) : next();
