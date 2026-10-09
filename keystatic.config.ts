@@ -1,4 +1,5 @@
 import { config, collection, singleton, fields } from '@keystatic/core';
+import { createElement, useEffect, useState } from 'react';
 import { SEO_DEFAULTS, type SeoPage } from './src/seo/defaults';
 
 const ALT_TEXT_HELP =
@@ -30,6 +31,39 @@ const SLUG_FIELD = {
 // section, and as the only content of the "Como usar o painel" page pinned at the top of the dashboard.
 function howTo(description: string, label = 'ℹ️ Como funciona') {
   return fields.object({}, { label, description });
+}
+
+/**
+ * fields.file with a playable preview under it. Keystatic's own file field only offers Choose file / Remove /
+ * Download, even though it already holds the file's bytes (that's what Download serves) — this wraps its Input and
+ * plays those same bytes from a blob URL, so the editor can see which video is live without downloading it.
+ */
+function videoFile(opts: Parameters<typeof fields.file>[0]) {
+  const base = fields.file(opts);
+  function Input(props: Parameters<typeof base.Input>[0]) {
+    const data = props.value?.data;
+    const [url, setUrl] = useState<string | null>(null);
+    useEffect(() => {
+      if (!data) return setUrl(null);
+      const next = URL.createObjectURL(new Blob([data], { type: 'video/mp4' }));
+      setUrl(next);
+      return () => URL.revokeObjectURL(next);
+    }, [data]);
+    return createElement(
+      'div',
+      { style: { display: 'flex', flexDirection: 'column', gap: 12 } },
+      createElement(base.Input, props),
+      url &&
+        createElement('video', {
+          src: url,
+          controls: true,
+          muted: true,
+          playsInline: true,
+          style: { maxWidth: '100%', maxHeight: 360, alignSelf: 'flex-start', borderRadius: 6, background: '#000' },
+        })
+    );
+  }
+  return { ...base, Input };
 }
 
 const SAVE_NOTE = 'Clique em "Save" no topo para publicar.';
@@ -203,14 +237,14 @@ export default config({
       path: 'src/content/singletons/hero',
       format: { data: 'json' },
       schema: {
-        howTo: howTo(`O topo do site: título, subtítulo, texto do botão e o vídeo de fundo. O Keystatic não mostra prévia de vídeo: para ver o vídeo atual, clique em "Download" no campo do vídeo. Para trocar, use um MP4 curto (10–20 s), horizontal e leve (de preferência abaixo de 10 MB). ${SAVE_NOTE} Textos aparecem em 1–2 min, vídeo em 4–5 min.`),
+        howTo: howTo(`O topo do site: título, subtítulo, texto do botão e o vídeo de fundo. O vídeo atual aparece embaixo do campo "Vídeo de Fundo", é só dar play. Para trocar, use um MP4 leve (de preferência abaixo de 10 MB). O site corta as bordas para preencher o topo da tela, então deixe o principal no centro do vídeo. ${SAVE_NOTE} Textos aparecem em 1–2 min, vídeo em 4–5 min.`),
         heading: fields.text({ label: 'Título', defaultValue: 'Magia além da pele' }),
         headingEn: enField('Título'),
         intro: fields.text({ label: 'Subtítulo', multiline: true }),
         introEn: enField('Subtítulo', true),
         button: fields.text({ label: 'Texto do Botão', defaultValue: 'Agendar horário' }),
         buttonEn: enField('Texto do Botão'),
-        video: fields.file({ label: 'Vídeo de Fundo', directory: 'public/videos', publicPath: '/videos/' }),
+        video: videoFile({ label: 'Vídeo de Fundo', directory: 'public/videos', publicPath: '/videos/' }),
       },
     }),
 
