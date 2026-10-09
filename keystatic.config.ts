@@ -66,6 +66,35 @@ function videoFile(opts: Parameters<typeof fields.file>[0]) {
   return { ...base, Input };
 }
 
+/** A read-only note with a clickable link — field descriptions are plain text, so a link needs its own Input. Stores nothing. */
+function linkNote(label: string, text: string, href: string, linkText: string) {
+  const base = fields.empty();
+  function Input() {
+    return createElement(
+      'div',
+      {
+        style: {
+          display: 'flex',
+          flexDirection: 'column',
+          gap: 6,
+          fontFamily: 'Inter, -apple-system, system-ui, "Segoe UI", Roboto, sans-serif', // Keystatic's own UI font
+          color: 'rgb(44, 44, 44)',
+        },
+      },
+      createElement('strong', { style: { fontSize: 16, fontWeight: 600 } }, label),
+      createElement('span', { style: { fontSize: 14, color: 'rgb(110, 110, 110)' } }, text),
+      createElement(
+        'a',
+        { href, target: '_blank', rel: 'noopener', style: { fontSize: 15, fontWeight: 600, color: '#3D5BD9' } },
+        linkText
+      )
+    );
+  }
+  return { ...base, Input };
+}
+
+const GUIDE_URL = 'https://claude.ai/artifact/AwMCuJw4GJ7ySEZkwhgVGx';
+
 const SAVE_NOTE = 'Clique em "Save" no topo para publicar.';
 
 const META_TITLE_HELP =
@@ -128,6 +157,12 @@ export default config({
       path: 'src/content/singletons/guide',
       format: { data: 'json' },
       schema: {
+        guideLink: linkNote(
+          '📘 Guia completo com imagens',
+          'Passo a passo com prints de cada parte: entrar, turnê, fotos, flashes, textos e o que fazer se algo der errado.',
+          GUIDE_URL,
+          'Abrir o guia →'
+        ),
         welcome: howTo('Aqui você muda os textos, fotos, flashes e as datas da turnê do site. Cada item do menu à esquerda é uma parte do site, e cada um tem um quadro "Como funciona" no topo explicando o que faz.', '👋 Bem-vinda'),
         save: howTo('Nada vai para o site até você clicar no botão azul "Save", no topo à direita. Depois disso o site se atualiza sozinho: textos, datas e status em 1–2 minutos; fotos e vídeos em 4–5 minutos (o site primeiro comprime a imagem). Se ainda vir a versão antiga, recarregue a página do site.', '💾 Salvar e publicar'),
         english: howTo('Os campos com "(EN)" são a versão em inglês do campo acima. Se deixar em branco, o site em inglês usa o texto em português.', '🇬🇧 Campos em inglês'),
