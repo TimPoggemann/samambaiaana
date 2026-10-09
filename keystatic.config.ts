@@ -25,9 +25,14 @@ const SLUG_FIELD = {
   description: 'Gerado automaticamente a partir do nome. Não precisa mexer.',
 };
 
-// Collections have no description slot in Keystatic's list view, so the how-to lives on the first field of every flash entry.
-const FLASH_HOW_TO =
-  'Como funciona: cada desenho é um item. Novo flash → "Add" na lista, preencha o nome, envie a imagem, escolha o status e clique em "Save". Reservado ou vendido → só mude o Status (os "Indisponível" vão sozinhos para o fim). A ordem segue "Ordem de Exibição", do menor para o maior; a página inicial mostra os 8 primeiros, a página Flash mostra todos. Remover → ícone de lixeira no topo.';
+// Keystatic has no description slot for a whole section (or the dashboard), but an object field with no
+// subfields renders as just its label and description — a read-only note. Used as the first field of every
+// section, and as the only content of the "Como usar o painel" page pinned at the top of the dashboard.
+function howTo(description: string, label = 'ℹ️ Como funciona') {
+  return fields.object({}, { label, description });
+}
+
+const SAVE_NOTE = 'Clique em "Save" no topo para publicar.';
 
 const META_TITLE_HELP =
   'Título do resultado no Google e texto na aba do navegador. Recomendação: 50–60 caracteres. "Samambaia Ana" é adicionado automaticamente, a menos que o título já contenha o nome.';
@@ -76,6 +81,7 @@ export default config({
   // Tour dates are the thing the client edits most (usually from a phone), so they get their own group pinned at the top.
   ui: {
     navigation: {
+      'Comece aqui': ['guide'],
       'Turnê': ['tour'],
       'Página inicial': ['hero', '---', 'portfolio', 'about', 'where', 'booking', 'flash', 'testimonials', 'faq', 'otherWork'],
       'Geral': ['footer', 'seo', 'privacy', 'terms'],
@@ -83,11 +89,26 @@ export default config({
   },
 
   singletons: {
+    guide: singleton({
+      label: '📖 Como usar o painel',
+      path: 'src/content/singletons/guide',
+      format: { data: 'json' },
+      schema: {
+        welcome: howTo('Aqui você muda os textos, fotos, flashes e as datas da turnê do site. Cada item do menu à esquerda é uma parte do site, e cada um tem um quadro "Como funciona" no topo explicando o que faz.', '👋 Bem-vinda'),
+        save: howTo('Nada vai para o site até você clicar no botão azul "Save", no topo à direita. Depois disso o site se atualiza sozinho: textos, datas e status em 1–2 minutos; fotos e vídeos em 4–5 minutos (o site primeiro comprime a imagem). Se ainda vir a versão antiga, recarregue a página do site.', '💾 Salvar e publicar'),
+        english: howTo('Os campos com "(EN)" são a versão em inglês do campo acima. Se deixar em branco, o site em inglês usa o texto em português.', '🇬🇧 Campos em inglês'),
+        photos: howTo('Pode enviar fotos direto do celular, em JPG ou PNG: o site comprime e converte sozinho. Sempre preencha o Alt Text, uma frase curta descrevendo a foto; ajuda pessoas com deficiência visual e o Google.', '📷 Fotos'),
+        careful: howTo('"Nome do arquivo (automático)" e o botão "Regenerate": são preenchidos sozinhos, pode ignorar. O seletor "main" no alto do menu: deixe sempre em main. No Portfólio, não use "Add" nem a lixeira: são 8 posições fixas. Política de Privacidade e Termos de Uso: combine com o Tim antes de mudar.', '⚠️ O que não mexer'),
+        help: howTo('Mudou algo sem querer e ainda não salvou? É só sair da página sem clicar em "Save". Salvou algo errado? Corrija e salve de novo; toda versão anterior fica guardada, então o Tim consegue recuperar qualquer coisa. Algo parece quebrado? Mande um print para o Tim.', '🆘 Se algo der errado'),
+      },
+    }),
+
     tour: singleton({
       label: '✈ Datas da Turnê',
       path: 'src/content/singletons/tour',
       format: { data: 'json' },
       schema: {
+        howTo: howTo(`Cidades e datas da turnê, que aparecem na faixa abaixo do topo, em "Onde me encontrar" e no formulário. Toque numa cidade para mudar as datas, use "Add" para adicionar e arraste os pontinhos para mudar a ordem. Sem turnê? Marque "Ocultar datas da turnê" mais abaixo: as datas ficam guardadas para a próxima. ${SAVE_NOTE} Aparece no site em 1–2 min.`),
         tourName: fields.text({
           label: 'Nome da Turnê',
           description: 'ex: Eurotour, Turnê Austrália. Aparece na faixa abaixo do topo e na seção "Onde me encontrar".',
@@ -178,10 +199,11 @@ export default config({
     }),
 
     hero: singleton({
-      label: 'Hero',
+      label: 'Hero (topo do site)',
       path: 'src/content/singletons/hero',
       format: { data: 'json' },
       schema: {
+        howTo: howTo(`O topo do site: título, subtítulo, texto do botão e o vídeo de fundo. O Keystatic não mostra prévia de vídeo: para ver o vídeo atual, clique em "Download" no campo do vídeo. Para trocar, use um MP4 curto (10–20 s), horizontal e leve (de preferência abaixo de 10 MB). ${SAVE_NOTE} Textos aparecem em 1–2 min, vídeo em 4–5 min.`),
         heading: fields.text({ label: 'Título', defaultValue: 'Magia além da pele' }),
         headingEn: enField('Título'),
         intro: fields.text({ label: 'Subtítulo', multiline: true }),
@@ -197,6 +219,7 @@ export default config({
       path: 'src/content/singletons/about',
       format: { data: 'json' },
       schema: {
+        howTo: howTo(`Sua bio (dois parágrafos) e o retrato da seção Sobre. Para trocar o retrato: "Choose file", escolha a foto (JPG do celular serve, o site comprime sozinho) e atualize o Alt Text. ${SAVE_NOTE} Fotos aparecem em 4–5 min.`),
         bioP1: fields.text({ label: 'Bio — Parágrafo 1', multiline: true }),
         bioP1En: enField('Bio — Parágrafo 1', true),
         bioP2: fields.text({ label: 'Bio — Parágrafo 2', multiline: true }),
@@ -212,6 +235,7 @@ export default config({
       path: 'src/content/singletons/where',
       format: { data: 'json' },
       schema: {
+        howTo: howTo(`A foto do estúdio e o texto "Estúdio próprio" da seção Onde me encontrar. As cidades e datas da turnê ficam em "✈ Datas da Turnê". ${SAVE_NOTE}`),
         studioPhoto: fields.image({ label: 'Foto do Estúdio', directory: 'public/images', publicPath: '/images/' }),
         studioPhotoAlt: fields.text({ label: 'Alt Text da Foto', description: ALT_TEXT_HELP }),
         studioPhotoAltEn: enField('Alt Text da Foto'),
@@ -231,6 +255,7 @@ export default config({
       path: 'src/content/singletons/booking',
       format: { data: 'json' },
       schema: {
+        howTo: howTo(`Os textos acima do formulário de agendamento: um na página inicial e outro no formulário da página Flash. As cidades da lista do formulário vêm de "✈ Datas da Turnê". ${SAVE_NOTE}`),
         intro: fields.text({ label: 'Texto Introdutório (seção Agendar)', multiline: true }),
         introEn: enField('Texto Introdutório', true),
         flashIntro: fields.text({ label: 'Texto Introdutório (formulário na página de Flash)', multiline: true }),
@@ -243,6 +268,7 @@ export default config({
       path: 'src/content/singletons/footer',
       format: { data: 'json' },
       schema: {
+        howTo: howTo(`O rodapé do site: linha de localização, e-mail de contato e os links do Instagram e da loja. ${SAVE_NOTE}`),
         location: fields.text({ label: 'Linha de Localização', defaultValue: 'Magia além da pele · São Paulo' }),
         locationEn: enField('Linha de Localização'),
         email: fields.text({ label: 'E-mail', defaultValue: 'ssamambaiana@gmail.com' }),
@@ -256,6 +282,7 @@ export default config({
       path: 'src/content/singletons/seo',
       format: { data: 'json' },
       schema: {
+        howTo: howTo(`Como o site aparece no Google e quando alguém compartilha o link (WhatsApp, Instagram etc.). Já está preenchido; só mude se quiser outro título ou descrição. ${SAVE_NOTE}`),
         homepage: seoPageFields('homepage', 'Homepage'),
         flash: seoPageFields('flash', 'Página de Flash'),
       },
@@ -270,6 +297,7 @@ export default config({
         // policy text once available. See suleika-portfolio's datenschutz
         // singleton (GDPR) for the equivalent structure if a more granular,
         // per-section layout is wanted later.
+        howTo: howTo(`Texto legal da página de Política de Privacidade. Combine com o Tim antes de mudar.`),
         body: fields.text({ label: 'Conteúdo', multiline: true }),
       },
     }),
@@ -279,6 +307,7 @@ export default config({
       path: 'src/content/singletons/terms',
       format: { data: 'json' },
       schema: {
+        howTo: howTo(`Texto legal da página de Termos de Uso. Combine com o Tim antes de mudar.`),
         body: fields.text({ label: 'Conteúdo', multiline: true }),
       },
     }),
@@ -286,7 +315,7 @@ export default config({
 
   collections: {
     portfolio: collection({
-      label: 'Portfólio (Trabalhos)',
+      label: 'Portfólio (fotos das tatuagens)',
       // Fixed 8 slots — the mosaic grid layout is hand-tuned in code per slot
       // position (see PORTFOLIO_LAYOUT in src/pages/index.astro), so this
       // collection only ever swaps the photo/alt text in each of the 8 slots.
@@ -295,6 +324,7 @@ export default config({
       format: { data: 'json' },
       columns: ['label', 'order'],
       schema: {
+        howTo: howTo(`As 8 fotos do mosaico de trabalhos. Cada posição (0–7) tem um lugar fixo no site: troque a foto com "Choose file" e atualize o Alt Text. Não use "Add" nem a lixeira aqui. A posição 7 é a foto grande do final, que cresce ao rolar a página: use uma foto horizontal. O site corta as bordas, então deixe a tatuagem no centro. ${SAVE_NOTE} Fotos aparecem em 4–5 min.`),
         label: fields.slug({
           name: {
             label: 'Slot',
@@ -316,7 +346,8 @@ export default config({
       format: { data: 'json' },
       columns: ['title', 'status', 'order'],
       schema: {
-        title: fields.slug({ name: { label: 'Nome do Desenho', description: FLASH_HOW_TO }, slug: SLUG_FIELD }),
+        howTo: howTo(`Cada desenho é um item. Novo flash: "Add" na lista, preencha o nome, envie a imagem, escolha o status. Reservado ou vendido: só mude o Status (os "Indisponível" vão sozinhos para o fim). A ordem segue "Ordem de Exibição", do menor para o maior; a página inicial mostra os 8 primeiros e a página Flash mostra todos. Remover: ícone de lixeira no topo. ${SAVE_NOTE}`),
+        title: fields.slug({ name: { label: 'Nome do Desenho' }, slug: SLUG_FIELD }),
         titleEn: enField('Nome do Desenho'),
         order: fields.integer({ label: 'Ordem de Exibição', defaultValue: 0 }),
         image: fields.image({ label: 'Imagem', directory: 'public/images/flash', publicPath: '/images/flash/' }),
@@ -339,6 +370,7 @@ export default config({
       format: { data: 'json' },
       columns: ['name', 'order'],
       schema: {
+        howTo: howTo(`As frases de clientes. "Add" na lista cria um depoimento novo e a lixeira no topo apaga. A ordem segue "Ordem de Exibição", do menor para o maior. ${SAVE_NOTE}`),
         name: fields.slug({ name: { label: 'Nome da Cliente' }, slug: SLUG_FIELD }),
         quote: fields.text({ label: 'Depoimento', multiline: true }),
         quoteEn: enField('Depoimento', true),
@@ -353,6 +385,7 @@ export default config({
       format: { data: 'json' },
       columns: ['question', 'order'],
       schema: {
+        howTo: howTo(`As perguntas e respostas da seção de perguntas frequentes. "Add" na lista cria uma nova e a lixeira no topo apaga. A ordem segue "Ordem de Exibição", do menor para o maior. ${SAVE_NOTE}`),
         question: fields.slug({ name: { label: 'Pergunta' }, slug: SLUG_FIELD }),
         questionEn: enField('Pergunta'),
         answer: fields.text({ label: 'Resposta', multiline: true }),
@@ -368,6 +401,7 @@ export default config({
       format: { data: 'json' },
       columns: ['label', 'order'],
       schema: {
+        howTo: howTo(`Os cards da seção de loja (cerâmica, prints etc.), cada um com nome, foto e link. "Add" na lista cria um novo e a lixeira no topo apaga. A ordem segue "Ordem de Exibição", do menor para o maior. ${SAVE_NOTE}`),
         label: fields.slug({ name: { label: 'Nome' }, slug: SLUG_FIELD }),
         labelEn: enField('Nome'),
         image: fields.image({ label: 'Foto', directory: 'public/images/other-work', publicPath: '/images/other-work/' }),
