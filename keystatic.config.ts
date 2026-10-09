@@ -25,6 +25,10 @@ const SLUG_FIELD = {
   description: 'Gerado automaticamente a partir do nome. Não precisa mexer.',
 };
 
+// Collections have no description slot in Keystatic's list view, so the how-to lives on the first field of every flash entry.
+const FLASH_HOW_TO =
+  'Como funciona: cada desenho é um item. Novo flash → "Add" na lista, preencha o nome, envie a imagem, escolha o status e clique em "Save". Reservado ou vendido → só mude o Status (os "Indisponível" vão sozinhos para o fim). A ordem segue "Ordem de Exibição", do menor para o maior; a página inicial mostra os 8 primeiros, a página Flash mostra todos. Remover → ícone de lixeira no topo.';
+
 const META_TITLE_HELP =
   'Título do resultado no Google e texto na aba do navegador. Recomendação: 50–60 caracteres. "Samambaia Ana" é adicionado automaticamente, a menos que o título já contenha o nome.';
 
@@ -313,7 +317,7 @@ export default config({
       format: { data: 'json' },
       columns: ['title', 'status', 'order'],
       schema: {
-        title: fields.slug({ name: { label: 'Nome do Desenho' }, slug: SLUG_FIELD }),
+        title: fields.slug({ name: { label: 'Nome do Desenho', description: FLASH_HOW_TO }, slug: SLUG_FIELD }),
         titleEn: enField('Nome do Desenho'),
         order: fields.integer({ label: 'Ordem de Exibição', defaultValue: 0 }),
         image: fields.image({ label: 'Imagem', directory: 'public/images/flash', publicPath: '/images/flash/' }),
