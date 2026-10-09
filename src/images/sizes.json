@@ -7,39 +7,35 @@
     832,
     907
   ],
-  "/images/ceramics.webp": [
-    1000,
-    1399
-  ],
-  "/images/flash-0.webp": [
+  "/images/flash/0/image.webp": [
     1100,
     1467
   ],
-  "/images/flash-1.webp": [
+  "/images/flash/1/image.webp": [
     1100,
     1467
   ],
-  "/images/flash-2.webp": [
+  "/images/flash/2/image.webp": [
     1100,
     1375
   ],
-  "/images/flash-3.webp": [
+  "/images/flash/3/image.webp": [
     1100,
     1375
   ],
-  "/images/flash-4.webp": [
+  "/images/flash/4/image.webp": [
     1100,
     1954
   ],
-  "/images/flash-5.webp": [
+  "/images/flash/5/image.webp": [
     1100,
     1954
   ],
-  "/images/flash-6.webp": [
+  "/images/flash/6/image.webp": [
     1100,
     1954
   ],
-  "/images/flash-7.webp": [
+  "/images/flash/7/image.webp": [
     1100,
     1954
   ],
@@ -51,45 +47,45 @@
     640,
     341
   ],
-  "/images/portfolio-0.webp": [
+  "/images/other-work/ceramics/image.webp": [
+    1000,
+    1399
+  ],
+  "/images/other-work/prints/image.webp": [
+    1000,
+    1333
+  ],
+  "/images/portfolio/0/image.webp": [
     1014,
     676
   ],
-  "/images/portfolio-1.webp": [
+  "/images/portfolio/1/image.webp": [
     1014,
     680
   ],
-  "/images/portfolio-2.webp": [
+  "/images/portfolio/2/image.webp": [
     1014,
     680
   ],
-  "/images/portfolio-3.webp": [
+  "/images/portfolio/3/image.webp": [
     501,
     668
   ],
-  "/images/portfolio-4.webp": [
+  "/images/portfolio/4/image.webp": [
     501,
     668
   ],
-  "/images/portfolio-5.webp": [
+  "/images/portfolio/5/image.webp": [
     501,
     668
   ],
-  "/images/portfolio-6.webp": [
+  "/images/portfolio/6/image.webp": [
     1200,
     804
   ],
-  "/images/portfolio-7-overlay.webp": [
+  "/images/portfolio/7/image.webp": [
     846,
     567
-  ],
-  "/images/portfolio-7.webp": [
-    668,
-    448
-  ],
-  "/images/prints.webp": [
-    1000,
-    1333
   ],
   "/images/studioPhoto.webp": [
     1170,

@@ -19,6 +19,12 @@ function enField(label: string, multiline = false) {
   return fields.text({ label: `${label} (EN)`, description: EN_HELP, multiline });
 }
 
+// The slug is only the entry's file name — the site never reads it — but Keystatic always shows it with a Regenerate button, so label it as something to ignore.
+const SLUG_FIELD = {
+  label: 'Nome do arquivo (automático)',
+  description: 'Gerado automaticamente a partir do nome. Não precisa mexer.',
+};
+
 const META_TITLE_HELP =
   'Título do resultado no Google e texto na aba do navegador. Recomendação: 50–60 caracteres. "Samambaia Ana" é adicionado automaticamente, a menos que o título já contenha o nome.';
 
@@ -302,9 +308,10 @@ export default config({
             label: 'Slot',
             description: 'Apenas um rótulo interno — não aparece no site. Não adicione ou remova itens; edite a foto de um dos 8 existentes.',
           },
+          slug: SLUG_FIELD,
         }),
         order: fields.integer({ label: 'Posição no Grid (0-7)', validation: { min: 0, max: 7 } }),
-        image: fields.image({ label: 'Foto', directory: 'public/images', publicPath: '/images/' }),
+        image: fields.image({ label: 'Foto', directory: 'public/images/portfolio', publicPath: '/images/portfolio/' }),
         imageAlt: fields.text({ label: 'Alt Text', description: ALT_TEXT_HELP }),
         imageAltEn: enField('Alt Text'),
       },
@@ -317,10 +324,10 @@ export default config({
       format: { data: 'json' },
       columns: ['title', 'status', 'order'],
       schema: {
-        title: fields.slug({ name: { label: 'Nome do Desenho' } }),
+        title: fields.slug({ name: { label: 'Nome do Desenho' }, slug: SLUG_FIELD }),
         titleEn: enField('Nome do Desenho'),
         order: fields.integer({ label: 'Ordem de Exibição', defaultValue: 0 }),
-        image: fields.image({ label: 'Imagem', directory: 'public/images', publicPath: '/images/' }),
+        image: fields.image({ label: 'Imagem', directory: 'public/images/flash', publicPath: '/images/flash/' }),
         status: fields.select({
           label: 'Status',
           options: [
@@ -340,7 +347,7 @@ export default config({
       format: { data: 'json' },
       columns: ['name', 'order'],
       schema: {
-        name: fields.slug({ name: { label: 'Nome da Cliente' } }),
+        name: fields.slug({ name: { label: 'Nome da Cliente' }, slug: SLUG_FIELD }),
         quote: fields.text({ label: 'Depoimento', multiline: true }),
         quoteEn: enField('Depoimento', true),
         order: fields.integer({ label: 'Ordem de Exibição', defaultValue: 0 }),
@@ -354,7 +361,7 @@ export default config({
       format: { data: 'json' },
       columns: ['question', 'order'],
       schema: {
-        question: fields.slug({ name: { label: 'Pergunta' } }),
+        question: fields.slug({ name: { label: 'Pergunta' }, slug: SLUG_FIELD }),
         questionEn: enField('Pergunta'),
         answer: fields.text({ label: 'Resposta', multiline: true }),
         answerEn: enField('Resposta', true),
@@ -369,9 +376,9 @@ export default config({
       format: { data: 'json' },
       columns: ['label', 'order'],
       schema: {
-        label: fields.slug({ name: { label: 'Nome' } }),
+        label: fields.slug({ name: { label: 'Nome' }, slug: SLUG_FIELD }),
         labelEn: enField('Nome'),
-        image: fields.image({ label: 'Foto', directory: 'public/images', publicPath: '/images/' }),
+        image: fields.image({ label: 'Foto', directory: 'public/images/other-work', publicPath: '/images/other-work/' }),
         url: fields.url({ label: 'Link da Loja' }),
         order: fields.integer({ label: 'Ordem de Exibição', defaultValue: 0 }),
       },

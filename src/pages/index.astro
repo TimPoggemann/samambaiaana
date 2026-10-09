@@ -250,7 +250,7 @@ const schema = graph(origin, lang, [
     relative to that section's box instead of the viewport once revealed.
   -->
   {portfolioZoom && (
-    <img id="portfolio-zoom-clone" src="/images/portfolio-7-overlay.webp" alt="" style="position: fixed; z-index: 10; overflow: hidden; opacity: 0; pointer-events: none; object-fit: cover; display: none;" />
+    <img id="portfolio-zoom-clone" src={portfolioZoom.data.image} alt="" style="position: fixed; z-index: 10; overflow: hidden; opacity: 0; pointer-events: none; object-fit: cover; display: none;" />
   )}
 
   <!-- ABOUT -->
