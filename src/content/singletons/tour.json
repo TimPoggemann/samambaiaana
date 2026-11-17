@@ -6,11 +6,6 @@
   "tourYearEn": "Oct – Dec 2026",
   "tourCities": [
     {
-      "name": "São Paulo",
-      "dates": "Março 2-26",
-      "datesEn": "March 2-26"
-    },
-    {
       "name": "Madri",
       "dates": "Novembro 17-19",
       "datesEn": "November 17-19",
@@ -39,6 +34,11 @@
       "dates": "Dezembro 6-9",
       "datesEn": "December 6-9",
       "nameEn": "Vienna"
+    },
+    {
+      "name": "São Paulo",
+      "dates": "Março 2-26 2027",
+      "datesEn": "March 2-26 2027"
     }
   ],
   "hideTour": false,
