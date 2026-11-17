@@ -1,5 +1,4 @@
 {
-  "/images/about-portrait.webp": "/images/about-portrait-480w.webp 480w, /images/about-portrait-768w.webp 768w, /images/about-portrait.webp 1000w",
   "/images/booking-illustration.webp": "/images/booking-illustration-480w.webp 480w, /images/booking-illustration.webp 832w",
   "/images/flash/cogumelo-estelar/image.webp": "/images/flash/cogumelo-estelar/image-480w.webp 480w, /images/flash/cogumelo-estelar/image-768w.webp 768w, /images/flash/cogumelo-estelar/image.webp 1100w",
   "/images/flash/danca-dos-cogumelos/image.webp": "/images/flash/danca-dos-cogumelos/image-480w.webp 480w, /images/flash/danca-dos-cogumelos/image-768w.webp 768w, /images/flash/danca-dos-cogumelos/image.webp 1100w",
@@ -18,6 +17,7 @@
   "/images/portfolio/fada-do-mar/image.webp": "/images/portfolio/fada-do-mar/image-480w.webp 480w, /images/portfolio/fada-do-mar/image-768w.webp 768w, /images/portfolio/fada-do-mar/image.webp 1014w",
   "/images/portfolio/mao-a-obra/image.webp": "/images/portfolio/mao-a-obra/image-480w.webp 480w, /images/portfolio/mao-a-obra/image.webp 846w",
   "/images/portfolio/o-rosto-do-sol/image.webp": "/images/portfolio/o-rosto-do-sol/image-480w.webp 480w, /images/portfolio/o-rosto-do-sol/image-768w.webp 768w, /images/portfolio/o-rosto-do-sol/image.webp 1014w",
+  "/images/portrait.webp": "/images/portrait-480w.webp 480w, /images/portrait-768w.webp 768w, /images/portrait.webp 1000w",
   "/images/studioPhoto.webp": "/images/studioPhoto-480w.webp 480w, /images/studioPhoto-768w.webp 768w, /images/studioPhoto.webp 1170w",
   "/images/winged-illustration.webp": "/images/winged-illustration-480w.webp 480w, /images/winged-illustration-768w.webp 768w, /images/winged-illustration.webp 875w"
 }

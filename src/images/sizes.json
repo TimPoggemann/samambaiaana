@@ -1,8 +1,4 @@
 {
-  "/images/about-portrait.webp": [
-    1000,
-    1250
-  ],
   "/images/booking-illustration.webp": [
     832,
     907
@@ -86,6 +82,10 @@
   "/images/portfolio/sereia-da-concha/image.webp": [
     501,
     668
+  ],
+  "/images/portrait.webp": [
+    1000,
+    1250
   ],
   "/images/studioPhoto.webp": [
     1170,
