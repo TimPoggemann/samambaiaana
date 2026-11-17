@@ -1,1 +1,8 @@
-{"title": "Cogumelo Estelar", "titleEn": "Starcap Mushroom", "order": 0, "image": "/images/flash/cogumelo-estelar/image.webp", "status": "available"}
+{
+  "howTo": {},
+  "title": "Cogumelo Estelar",
+  "titleEn": "Starcap Mushroom",
+  "order": 0,
+  "image": "/images/flash/cogumelo-estelar/image.webp",
+  "status": "taken"
+}
