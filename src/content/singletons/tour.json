@@ -1,35 +1,61 @@
 {
-  "tourName": "São Paulo & Eurotour",
-  "tourNameEn": "São Paulo & Eurotour",
+  "howTo": {},
+  "tourName": "São Paulo & Europe",
+  "tourNameEn": "São Paulo & Europe",
   "tourYear": "Out – Dez 2026",
   "tourYearEn": "Oct – Dec 2026",
   "tourCities": [
     {
       "name": "São Paulo",
-      "dates": "Out 7–20",
-      "datesEn": "Oct 7–20"
+      "dates": "Março 2-26",
+      "datesEn": "March 2-26"
     },
     {
-      "name": "Cidades em breve",
-      "dates": "tbc",
-      "nameEn": "Cities coming soon"
+      "name": "Madri",
+      "dates": "Novembro 17-19",
+      "datesEn": "November 17-19",
+      "nameEn": "Madrid"
+    },
+    {
+      "name": "Zurique ",
+      "dates": "Novembro 21-23",
+      "datesEn": "November 21-23",
+      "nameEn": "Zurich"
+    },
+    {
+      "name": "Amsterdam ",
+      "dates": "Novembro 25-30",
+      "datesEn": "November 25-30",
+      "nameEn": "Amsterdam "
+    },
+    {
+      "name": "Berlim ",
+      "dates": "Dezembro 1-4",
+      "datesEn": "December 1-4",
+      "nameEn": "Berlin"
+    },
+    {
+      "name": "Viena",
+      "dates": "Dezembro 6-9",
+      "datesEn": "December 6-9",
+      "nameEn": "Vienna"
     }
   ],
   "hideTour": false,
-  "bookingsOpenText": "reservas abertas",
-  "bookingsOpenTextEn": "bookings open",
-  "datesText": "datas",
-  "datesTextEn": "dates",
-  "formHomeOption": "Cidade e datas — São Paulo (ano todo)",
-  "formHomeOptionEn": "City & dates — São Paulo (year-round)",
+  "bookingsOpenText": "Reservas abertas",
+  "bookingsOpenTextEn": "Bookings open",
+  "datesText": "Datas",
+  "datesTextEn": "Dates",
+  "formHomeOption": "Cidade e datas — São Paulo (Março 2-26)",
+  "formHomeOptionEn": "City & dates — São Paulo (March 2-26)",
   "noTourStripLabel": "Agenda aberta · Estúdio em São Paulo",
   "noTourStripLabelEn": "Bookings open · Studio in São Paulo",
   "noTourStripDetail": "Sessões com hora marcada",
   "noTourStripDetailEn": "Sessions by appointment",
   "noTourHeading": "Em viagem",
   "noTourHeadingEn": "On the road",
-  "noTourText": "Por onde ando? Entre florestas tropicais, lagos que guardam segredos e cidades que tocam o céu — seguindo o rastro das fadas. Me mande uma mensagem e eu conto onde estou, para marcarmos a sua sessão.",
-  "noTourTextEn": "Where am I? Somewhere between tropical forests, lakes that keep secrets and cities that touch the sky — following the fairies' trail. Send me a message and I'll tell you where I am, so we can plan your session.",
+  "noTourText": "Por onde ando? Entre florestas tropicais, lagos que guardam segredos e cidades que tocam o céu — seguindo o rastro dos seres encantados entre nós. Me mande uma mensagem e eu conto onde estou, para marcarmos nossa sessão.",
+  "noTourTextEn": "Where am I? Somewhere between tropical forests, lakes that keep secrets and cities that touch the sky — following the enchanted being around us. Send me a message and I'll tell you where I’m, so we can plan our session.",
   "noTourLink": "Agendar horário",
   "noTourLinkEn": "Book an appointment"
 }
